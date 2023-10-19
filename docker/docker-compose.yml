@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    command: uvicorn app:app_ --reload --host 0.0.0.0
+    volumes:
+      - ../:/app
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    env_file:
+      - env_files/.env
+    networks:
+      - fastapi_network
+
+  worker:
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+    command: celery -A app.internal.celery_app.celery worker --beat --loglevel=INFO
+    volumes:
+      - .:/usr/src/celery_reports
+    env_file:
+      - env_files/.env
+    environment:
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    depends_on:
+      - redis
+      - app
+    networks:
+      - fastapi_network
+
+  redis:
+    image: redis:6-alpine
+    networks:
+      - fastapi_network
+  db:
+    image: postgres:15.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    expose:
+      - 5432
+    env_file:
+      - env_files/.env
+    networks:
+      - fastapi_network
+
+
+
+  web:
+    container_name: 'nginx'
+    image: nginx:alpine
+    depends_on:
+      - app
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    networks:
+      - fastapi_network
+
+volumes:
+  postgres_data:
+networks:
+  fastapi_network:
+    driver: bridge

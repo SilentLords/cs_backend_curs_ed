@@ -1,0 +1,35 @@
+name: Build and Test Container
+
+on:
+  push:
+    branches:
+      - '*dev*'
+
+jobs:
+  build:
+    runs-on: self-hosted-test
+    steps:
+      - name: Fix broken permissions error
+        run: | 
+          sudo chown -R runner-user:runner-user /home/runner-user/actions-runner/_work/CS-Backend
+          
+      - name: Checkout code
+        uses: actions/checkout@v3
+          
+      - name: Stop compose
+        run: |
+          sudo docker-compose --env-file docker/env_files/.env down || true
+      
+      - name: Start compose with building new image
+        run: |
+          sudo docker-compose --env-file docker/env_files/.env up -d --build
+      
+      - name: Test health-check endpoint
+        run: |
+          sleep 5
+          curl http://localhost:8020/
+
+      - name: Clean up
+        run: |
+          sudo docker image prune -f
+ 

@@ -18,11 +18,11 @@ jobs:
           
       - name: Stop compose
         run: |
-          sudo docker-compose --env-file docker/env_files/.env down || true
+          sudo docker-compose --env-file docker/env_files/.env -f docker/docker-compose.yml down || true
       
       - name: Start compose with building new image
         run: |
-          sudo docker-compose --env-file docker/env_files/.env up -d --build
+          sudo docker-compose --env-file docker/env_files/.env  -f docker/docker-compose.yml up -d --build
       
       - name: Test health-check endpoint
         run: |

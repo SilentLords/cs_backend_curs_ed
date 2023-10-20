@@ -14,7 +14,7 @@ services:
     ports:
       - "8000"
     env_file:
-      - docker/env_files/.env
+      - env_files/.env
     networks:
       - fastapi_network
 
@@ -27,7 +27,7 @@ services:
     volumes:
       - .:/usr/src/celery_reports
     env_file:
-      - docker/env_files/.env
+      - env_files/.env
     environment:
       - CELERY_BROKER_URL=${CELERY_BROKER_URL}
       - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
@@ -54,7 +54,7 @@ services:
     expose:
       - 5432
     env_file:
-      - docker/env_files/.env
+      - env_files/.env
     networks:
       - fastapi_network
 

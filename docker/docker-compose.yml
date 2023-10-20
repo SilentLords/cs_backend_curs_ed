@@ -12,7 +12,7 @@ services:
     depends_on:
       - db
     ports:
-      - "8020:8000"
+      - "8000"
     env_file:
       - env_files/.env
     networks:

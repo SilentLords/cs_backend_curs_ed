@@ -61,12 +61,12 @@ services:
 
 
   web:
-    container_name: 'nginx'
+    container_name: "${COMPOSE_PROJECT_NAME}-nginx"
     image: nginx:alpine
     depends_on:
       - app
     ports:
-      - 80:80
+      - 8020:80
     volumes:
       - ./nginx:/etc/nginx/conf.d
     networks:

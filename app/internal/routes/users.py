@@ -36,7 +36,7 @@ async def auth(request: Request):
     try:
         token = await oauth.create_client("Client_cs2").authorize_access_token(request)
         # print(token)
-        user = await oauth.create_client("Client_cs2").parse_id_token(request, token)
+        user = await oauth.create_client("Client_cs2").parse_id_token(token=token)
         request.session["user"] = user["sub"]
         return RedirectResponse(url="/")
     except OAuthError as e:
@@ -47,4 +47,3 @@ async def auth(request: Request):
 async def logout(request: Request):
     request.session.pop("user", None)
     return RedirectResponse(url="/")
-

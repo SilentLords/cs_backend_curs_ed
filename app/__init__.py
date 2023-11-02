@@ -31,6 +31,7 @@ def db_init_models():
     asyncio.run(init_models())
     print("Done")
 
+cli()
 # @app_.get("/docs")
 # def read_docs():
 #     return get_swagger_ui_html(openapi_url="/openapi.json")

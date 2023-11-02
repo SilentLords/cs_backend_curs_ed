@@ -10,9 +10,9 @@ class Settings(BaseSettings):
     db_port: str = Field(..., env='DB_PORT')
     celery_backend_url: str = Field(..., env='CELERY_BACKEND_URL')
     # oauth_client_id: str = Field(..., env='OAUTH_CLIENT_ID')
-    oauth_client_id: str = "cb0ff22f-2a68-4c58-97dc-fb2e50c06831"
+    oauth_client_id: str = "65a232fb-fc61-46a8-9818-aa3777269130"
     # oauth_client_secret: str = Field(..., env='OAUTH_CLIENT_SECRET')
-    oauth_client_secret: str = "9ne2aL8JR1T8htrwMzKFmvt6FHnGTQPlHok6ytz4"
+    oauth_client_secret: str = "0h4ilhKtV8FVKBYX46Nd6112C8xpKVUWmH10piNJ"
     # oauth_authorize_redirect_path: str = Field(..., env='OAUTH_AUTHORIZE_REDIRECT_PATH')
     oauth_authorize_redirect_path: str = "https://cs2-backend.evom.dev/api/v1/users/login/callback"
     # JWT

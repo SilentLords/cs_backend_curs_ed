@@ -37,7 +37,7 @@ async def auth(request: Request):
     try:
         token = await client.authorize_access_token(request)
         print(token)
-        user = token['userinfo']
+        user = client.userinfo(token=token)
         print(user)
         request.session["user"] = user["sub"]
         return RedirectResponse(url="/")

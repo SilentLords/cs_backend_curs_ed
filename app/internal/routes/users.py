@@ -31,7 +31,7 @@ async def login(request: Request):
 
 @router.get("/login/callback")
 async def auth(request: Request):
-    print('req:', await request.json())
+    print('req:', request.query_params)
 
     try:
         token = await oauth.create_client("Client_cs2").authorize_access_token(request)

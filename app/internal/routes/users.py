@@ -37,8 +37,9 @@ async def auth(request: Request):
     try:
         token = await client.authorize_access_token(request)
         print(token)
-        user = await client.parse_id_token(token)
-        request.session["user"] = user["sub"]
+        user = await client.userinfo(token=token)
+        print(user)
+        request.session["user"] = dict(user)
         return RedirectResponse(url="/")
     except OAuthError as e:
         return JSONResponse({"error": "OAuth error", "message": str(e)})

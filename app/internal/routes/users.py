@@ -37,7 +37,7 @@ async def auth(request: Request):
     try:
         token = await client.authorize_access_token(request)
 
-        user = await client.parse_id_token(request, token)
+        user = await client.parse_id_token(token)
         request.session["user"] = user["sub"]
         return RedirectResponse(url="/")
     except OAuthError as e:

@@ -40,5 +40,5 @@ def register_oauth() -> OAuth:
         jwks_uri = 'https://api.faceit.com/auth/v1/oauth/certs',
         # jwks={"keys": ["https://api.faceit.com/auth/v1/oauth/certs"]},
     )
-    client_cs2 = oauth.create_client("Client_cs2")
-    return client_cs2
+
+    return oauth

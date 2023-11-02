@@ -36,6 +36,7 @@ def register_oauth() -> OAuth:
             'code_challenge_method': 'S256',  # Метод хэширования PKCE
             'code_challenge': code_challenge  # PKCE хэш
         },
+        jwks={"keys": ["https://api.faceit.com/auth/v1/oauth/certs"]},
     )
 
     return oauth

@@ -25,6 +25,7 @@ async def home(request: Request):
 @router.get("/login")
 async def login(request: Request):
     redirect_uri = settings.oauth_authorize_redirect_path
+    print(redirect_uri)
     return await oauth.create_client("Client_cs2").authorize_redirect(request, redirect_uri, redirect_popup=True)
 
 

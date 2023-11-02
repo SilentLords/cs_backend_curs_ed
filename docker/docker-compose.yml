@@ -58,13 +58,13 @@ services:
     networks:
       - fastapi_network
 
-  dozzle:
-    container_name: dozzle_cs
-    image: amir20/dozzle:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - "9999:8080"
+#  dozzle:
+#    container_name: dozzle_cs
+#    image: amir20/dozzle:latest
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    ports:
+#      - "9999:8080"
 
 #  web:
 #    container_name: "${COMPOSE_PROJECT_NAME}-nginx"

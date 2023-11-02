@@ -26,7 +26,7 @@ async def home(request: Request):
 async def login(request: Request):
     redirect_uri = settings.oauth_authorize_redirect_path
     print(redirect_uri)
-    return await oauth.create_client("Client_cs2").authorize_redirect(request, redirect_uri, redirect_popup=True, nonce="xxx")
+    return await oauth.create_client("Client_cs2").authorize_redirect(request, redirect_uri, redirect_popup=True)
 
 
 @router.get("/login/callback")
@@ -37,7 +37,8 @@ async def auth(request: Request):
     try:
         token = await client.authorize_access_token(request)
         print(token)
-        user = await client.parse_id_token(token, nonce="xxx")
+        user = token['userinfo']
+        print(user)
         request.session["user"] = user["sub"]
         return RedirectResponse(url="/")
     except OAuthError as e:

@@ -59,7 +59,7 @@ services:
       - fastapi_network
 
   dozzle:
-    container_name: dozzle
+    container_name: dozzle_cs
     image: amir20/dozzle:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

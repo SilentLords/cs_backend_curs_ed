@@ -25,8 +25,8 @@ def register_oauth() -> OAuth:
     # Конфигурация OAuth клиента для стороннего сервиса
     oauth.register(
         name='Client_cs2',
-        client_id='cb0ff22f-2a68-4c58-97dc-fb2e50c06831',
-        client_secret='9ne2aL8JR1T8htrwMzKFmvt6FHnGTQPlHok6ytz4',
+        client_id='65a232fb-fc61-46a8-9818-aa3777269130',
+        client_secret='0h4ilhKtV8FVKBYX46Nd6112C8xpKVUWmH10piNJ',
         authorize_url='https://accounts.faceit.com',
         access_token_url='https://api.faceit.com/auth/v1/oauth/token',
         authorize_params=None,

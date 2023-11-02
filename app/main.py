@@ -11,3 +11,7 @@ cli = typer.Typer()
 def db_init_models():
     asyncio.run(init_models())
     print("Done")
+
+
+if __name__ == "__main__":
+    cli()

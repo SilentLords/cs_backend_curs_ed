@@ -24,19 +24,20 @@ async def home(request: Request):
 
 @router.get("/login")
 async def login(request: Request):
-    redirect_uri = 'https://cs2-backend.evom.dev/api/v1/users/login/callback'
+    redirect_uri = settings.oauth_authorize_redirect_path
     print(redirect_uri)
-    return await oauth.zauthorize_redirect(request, redirect_uri, redirect_popup=True)
+    return await oauth.create_client("Client_cs2").authorize_redirect(request, redirect_uri, redirect_popup=True)
 
 
 @router.get("/login/callback")
 async def auth(request: Request):
+    client = oauth.create_client("Client_cs2")
     print('req:', request.query_params)
     new_req = request
     try:
-        token = await oauth.create_client("Client_cs2").authorize_access_token(request)
-        # print(token)
-        user = token['userinfo']
+        token = await client.authorize_access_token(request)
+
+        user = await client.parse_id_token(request, token)
         request.session["user"] = user["sub"]
         return RedirectResponse(url="/")
     except OAuthError as e:

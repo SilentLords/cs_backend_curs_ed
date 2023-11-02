@@ -35,7 +35,7 @@ def register_oauth() -> OAuth:
         client_kwargs={
             'code_challenge_method': 'S256',  # Метод хэширования PKCE
             'code_challenge': code_challenge,  # PKCE хэш
-            'scope': "email membership openid profile"
+            'scope': "openid profile"
         },
         jwks={"keys": ["https://api.faceit.com/auth/v1/oauth/certs"]},
     )

@@ -1,3 +1,6 @@
+import asyncio
+
+import typer as typer
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.middleware.sessions import SessionMiddleware
@@ -5,8 +8,10 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.configuration.server import Server
 from app.configuration.settings import settings
 from app.internal.models import __models__
+from app.pkg.postgresql import init_models
 
 app_: FastAPI
+cli = typer.Typer()
 
 
 def create_app(_=None) -> FastAPI:
@@ -20,6 +25,11 @@ def create_app(_=None) -> FastAPI:
 
 app_ = create_app()
 
+
+@cli.command()
+def db_init_models():
+    asyncio.run(init_models())
+    print("Done")
 
 # @app_.get("/docs")
 # def read_docs():

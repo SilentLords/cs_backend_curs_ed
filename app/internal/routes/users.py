@@ -1,11 +1,14 @@
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, JSONResponse
 
 from fastapi import FastAPI, Depends, HTTPException, APIRouter
 from authlib.integrations.starlette_client import OAuthError
-
+from app.internal.models.user import User
 from app.configuration.settings import settings
 from app.internal.utils.oauth import register_oauth
+from app.internal.utils.services import get_or_create_user
+from app.pkg.postgresql import get_session
 
 router = APIRouter(
     prefix='/api/v1/users'
@@ -30,16 +33,14 @@ async def login(request: Request):
 
 
 @router.get("/login/callback")
-async def auth(request: Request):
+async def auth(request: Request, session: AsyncSession = Depends(get_session)):
     client = oauth.create_client("Client_cs2")
-    print('req:', request.query_params)
-    new_req = request
     try:
         token = await client.authorize_access_token(request)
-        print(token)
         user = await client.userinfo(token=token)
-        print(user)
         request.session["user"] = dict(user)
+        res = await get_or_create_user(session, request.session['user']['nickname'])
+        print(res)
         return RedirectResponse(url="/")
     except OAuthError as e:
         return JSONResponse({"error": "OAuth error", "message": str(e)})

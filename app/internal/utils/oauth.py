@@ -34,7 +34,8 @@ def register_oauth() -> OAuth:
         authorize_redirect_path='https://cs2-backend.evom.dev/api/v1/users/login/callback',
         client_kwargs={
             'code_challenge_method': 'S256',  # Метод хэширования PKCE
-            'code_challenge': code_challenge  # PKCE хэш
+            'code_challenge': code_challenge,  # PKCE хэш
+            'scope': "email membership openid profile"
         },
         jwks={"keys": ["https://api.faceit.com/auth/v1/oauth/certs"]},
     )

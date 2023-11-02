@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from app.configuration.settings import Settings
 
 settings = Settings()
-SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.db_username}:{settings.db_password}@db/{settings.db_name}"
+SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{settings.db_username}:{settings.db_password}@db/{settings.db_name}"
 
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 

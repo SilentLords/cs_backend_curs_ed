@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   app:
-    container_name: "${COMPOSE_PROJECT_NAME}-app"
+    container_name: "${COMPOSE_PROJECT_NAME}app"
     build:
       context: .
       dockerfile: ./api/Dockerfile
@@ -23,7 +23,7 @@ services:
       context: .
       dockerfile: ./api/Dockerfile
     command: celery -A app.internal.celery_app.celery worker --beat --loglevel=INFO
-    container_name: "${COMPOSE_PROJECT_NAME}-worker"
+    container_name: "${COMPOSE_PROJECT_NAME}worker"
     volumes:
       - .:/usr/src/celery_reports
     env_file:
@@ -39,22 +39,22 @@ services:
 
   redis:
     image: redis:6-alpine
-    container_name: "${COMPOSE_PROJECT_NAME}-redis"
+    container_name: "${COMPOSE_PROJECT_NAME}redis"
     networks:
       - fastapi_network
   db:
     image: postgres:15.0-alpine
-    container_name: "${COMPOSE_PROJECT_NAME}-db"
+    container_name: "${COMPOSE_PROJECT_NAME}db"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - env_files/.env
     environment:
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     expose:
       - 5432
-    env_file:
-      - env_files/.env
     networks:
       - fastapi_network
 

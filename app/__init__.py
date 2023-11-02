@@ -18,6 +18,8 @@ def create_app(_=None) -> FastAPI:
     app = FastAPI()
     app_ = Server(app).get_class()
     app_.add_middleware(SessionMiddleware, secret_key="your-secret-key")
+    asyncio.run(init_models())
+    print("Done")
     return Server(app).get_class()
 
 

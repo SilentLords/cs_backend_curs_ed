@@ -2,7 +2,7 @@ import asyncio
 
 import typer
 
-from pkg.postgresql import init_models
+from postgresql import init_models
 
 cli = typer.Typer()
 

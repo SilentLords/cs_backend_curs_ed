@@ -11,19 +11,13 @@ from app.internal.models import __models__
 from app.pkg.postgresql import init_models
 
 app_: FastAPI
-cli = typer.Typer()
 
-@cli.command()
-def db_init_models():
-    asyncio.run(init_models())
-    print("Done")
 
 def create_app(_=None) -> FastAPI:
     global app_
     app = FastAPI()
     app_ = Server(app).get_class()
     app_.add_middleware(SessionMiddleware, secret_key="your-secret-key")
-    cli()
     return Server(app).get_class()
 
 

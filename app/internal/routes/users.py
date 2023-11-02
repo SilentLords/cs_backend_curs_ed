@@ -36,7 +36,8 @@ async def auth(request: Request):
     try:
         token = await oauth.create_client("Client_cs2").authorize_access_token(request)
         # print(token)
-
+        print(type(token))
+        print(token)
         user = token['userinfo']
         request.session["user"] = user["sub"]
         return RedirectResponse(url="/")

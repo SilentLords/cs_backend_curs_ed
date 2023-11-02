@@ -38,6 +38,7 @@ def register_oauth() -> OAuth:
             # 'scope': "openid profile"
         },
         jwks_uri = 'https://api.faceit.com/auth/v1/oauth/certs',
+        userinfo_endpoint='https://api.faceit.com/auth/v1/resources/userinfo'
         # jwks={"keys": ["https://api.faceit.com/auth/v1/oauth/certs"]},
     )
 

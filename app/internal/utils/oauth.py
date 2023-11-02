@@ -31,7 +31,7 @@ def register_oauth() -> OAuth:
         access_token_url='https://api.faceit.com/auth/v1/oauth/token',
         authorize_params=None,
         authorize_prompt=False,
-        authorize_redirect_path='https://cs2-backend.evom.dev/api/v1/users/login/callback',
+        authorize_redirect_path='https://bbf1-92-248-188-134.ngrok-free.app/api/v1/users/login/callback',
         client_kwargs={
             'code_challenge_method': 'S256',  # Метод хэширования PKCE
             'code_challenge': code_challenge  # PKCE хэш

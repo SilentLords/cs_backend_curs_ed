@@ -28,6 +28,7 @@ def register_oauth() -> OAuth:
         client_id=settings.oauth_client_id,
         client_secret=settings.oauth_client_secret,
         authorize_url='https://accounts.faceit.com',
+        access_token_url='https://api.faceit.com/auth/v1/oauth/token',
         authorize_params=None,
         authorize_prompt=False,
         authorize_redirect_path=settings.oauth_authorize_redirect_path,

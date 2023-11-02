@@ -37,7 +37,7 @@ def register_oauth() -> OAuth:
             'code_challenge': code_challenge,  # PKCE хэш
             'scope': "openid profile"
         },
-        server_metadata_url= 'https://api.faceit.com/auth/v1/oauth/certs',
+        jwks_uri = 'https://api.faceit.com/auth/v1/oauth/certs',
         # jwks={"keys": ["https://api.faceit.com/auth/v1/oauth/certs"]},
     )
 

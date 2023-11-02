@@ -1,6 +1,6 @@
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, JSONResponse
-
+from authlib.common.security import generate_token
 from fastapi import FastAPI, Depends, HTTPException, APIRouter
 from authlib.integrations.starlette_client import OAuthError
 
@@ -25,8 +25,9 @@ async def home(request: Request):
 @router.get("/login")
 async def login(request: Request):
     redirect_uri = 'https://cs2-backend.evom.dev/api/v1/users/login/callback'
+    nonce = generate_token()
     print(redirect_uri)
-    return await oauth.create_client("Client_cs2").authorize_redirect(request, redirect_uri, redirect_popup=True)
+    return await oauth.create_client("Client_cs2").authorize_redirect(request, redirect_uri, redirect_popup=True, nonce=nonce)
 
 
 @router.get("/login/callback")

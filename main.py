@@ -15,12 +15,12 @@ app = typer.Typer()
 #     print(f"Hello {name}")
 #
 #
-# @app.command()
-# def goodbye(name: str, formal: bool = False):
-#     if formal:
-#         print(f"Goodbye Ms. {name}. Have a good day.")
-#     else:
-#         print(f"Bye {name}!")
+@app.command()
+def goodbye(name: str, formal: bool = False):
+    asyncio.run(init_models())
+    print("Done")
+
+
 @app.command()
 def db_init_models(name: str):
     asyncio.run(init_models())

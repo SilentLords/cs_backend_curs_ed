@@ -55,8 +55,8 @@ services:
       - POSTGRES_DB=${DB_NAME}
     expose:
       - 5432
-    ports:
-      - "5432:5432"
+#    ports:
+#      - "5432:5432"
     networks:
       - fastapi_network
 

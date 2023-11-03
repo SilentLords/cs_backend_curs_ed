@@ -6,14 +6,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.internal.models.user import *
-from fastapi.security import OAuth2AuthorizationCodeBearer
+from fastapi.security import OAuth2PasswordBearer
 
 from jose import jwt, JWTError
 
 from app.internal.utils.models import CommonHTTPException, TokenData
 from app.pkg.postgresql import get_session, settings
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def get_or_create_user(session: AsyncSession, nickname: str, openid: str):

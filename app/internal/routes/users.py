@@ -11,9 +11,9 @@ from app.configuration.settings import settings
 from app.internal.utils.oauth import register_oauth
 from app.internal.utils.services import get_or_create_user, create_access_token
 from app.pkg.postgresql import get_session
-from fastapi.security import OAuth2AuthorizationCodeBearer
+from fastapi.security import OAuth2PasswordBearer
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter(
     prefix='/api/v1/users'

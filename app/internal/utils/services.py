@@ -31,7 +31,7 @@ async def get_or_create_user(session: AsyncSession, nickname: str, openid: str):
 async def get_user(nickname: str, session: AsyncSession):
     user = await session.execute(select(User).where(User.nickname == nickname))
     if user := user.scalars().all():
-        user = user.first()
+        user = user[0]
         return user
     return None
 

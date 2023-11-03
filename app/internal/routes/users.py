@@ -41,7 +41,7 @@ async def login(request: Request):
 
 @router.get("/me")
 async def get_me( session: AsyncSession = Depends(get_session)):
-    current_user = await get_current_user(se)
+    current_user = await get_current_user(session)
     return current_user
 
 @router.get("/login/callback")

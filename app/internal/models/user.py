@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Float, MetaData, Table
 from app.pkg.postgresql import Base
-
+#test
 metadata = MetaData()
 users = Table(
     'users',

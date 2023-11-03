@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, JSONResponse
@@ -7,8 +9,11 @@ from authlib.integrations.starlette_client import OAuthError
 from app.internal.models.user import User
 from app.configuration.settings import settings
 from app.internal.utils.oauth import register_oauth
-from app.internal.utils.services import get_or_create_user
+from app.internal.utils.services import get_or_create_user, create_access_token
 from app.pkg.postgresql import get_session
+from fastapi.security import OAuth2AuthorizationCodeBearer
+
+oauth2_scheme = OAuth2AuthorizationCodeBearer(tokenUrl="token")
 
 router = APIRouter(
     prefix='/api/v1/users'
@@ -39,9 +44,13 @@ async def auth(request: Request, session: AsyncSession = Depends(get_session)):
         token = await client.authorize_access_token(request)
         user = await client.userinfo(token=token)
         request.session["user"] = dict(user)
-        res = await  get_or_create_user(session, request.session['user']['nickname'])
+        res = await  get_or_create_user(session, request.session['user']['nickname'], request.session['user']['openid'])
         print(res.id)
-        return RedirectResponse(url="/")
+        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+        access_token = create_access_token(
+            data={"sub": request.session['user']['nickname']}, expires_delta=access_token_expires
+        )
+        return RedirectResponse(url=f"/?token={access_token}")
     except OAuthError as e:
         return JSONResponse({"error": "OAuth error", "message": str(e)})
 
@@ -50,4 +59,3 @@ async def auth(request: Request, session: AsyncSession = Depends(get_session)):
 async def logout(request: Request):
     request.session.pop("user", None)
     return RedirectResponse(url="/")
-

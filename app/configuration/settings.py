@@ -16,9 +16,9 @@ class Settings(BaseSettings):
     # oauth_authorize_redirect_path: str = Field(..., env='OAUTH_AUTHORIZE_REDIRECT_PATH')
     oauth_authorize_redirect_path: str = "https://cs2-backend.evom.dev/api/v1/users/login/callback"
     # JWT
-    # jwt_secret_key: str = "9f63d3214da92c45a40d3866a5fb93e998afca753a557fee0de7ba8d6551767c"
-    # jwt_algorithm: str = 'HS256'
-    # access_token_expire_minutes: int = 1000
+    jwt_secret_key: str = "9f63d3214da92c45a40d3866a5fb93e998afca753a557fee0de7ba8d6551767c"
+    jwt_algorithm: str = 'HS256'
+    access_token_expire_minutes: int = 1000
 
 
 settings = Settings()

@@ -8,8 +8,6 @@ from fastapi import Response
 T = TypeVar('T')
 
 
-
-
 class Content(BaseModel):
     message: str = Field(..., description='Response message')
     result: Optional[T] = None
@@ -22,3 +20,12 @@ class CommonResponse(Response):
 
 class CommonHTTPException(HTTPException):
     detail: Content
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None

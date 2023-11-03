@@ -10,7 +10,8 @@ from authlib.integrations.starlette_client import OAuthError
 from app.internal.models.user import User
 from app.configuration.settings import settings
 from app.internal.utils.oauth import register_oauth
-from app.internal.utils.services import get_or_create_user, create_access_token, get_current_active_user
+from app.internal.utils.services import get_or_create_user, create_access_token, get_current_active_user, \
+    get_current_user
 from app.pkg.postgresql import get_session
 from fastapi.security import OAuth2PasswordBearer
 
@@ -39,7 +40,8 @@ async def login(request: Request):
 
 
 @router.get("/me")
-async def get_me(current_user: Annotated[User, Depends(get_current_active_user)]):
+async def get_me( session: AsyncSession = Depends(get_session)):
+    current_user = await get_current_user(se)
     return current_user
 
 @router.get("/login/callback")

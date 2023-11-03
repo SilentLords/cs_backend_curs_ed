@@ -16,4 +16,4 @@ class Billing(Base):
     id: Column = Column(Integer, autoincrement=True, primary_key=True, index=True)
     banned: Column = Column(Boolean, default=True)
     money_count: Column = Column(Float, default=0)
-    owner: Column = Column("User", back_populates="items", nullable=True)
+    # owner: Column = Column("User", back_populates="items", nullable=True)

@@ -5,14 +5,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from app import settings
 from app.internal.models.user import *
 from fastapi.security import OAuth2AuthorizationCodeBearer
 
 from jose import jwt, JWTError
 
 from app.internal.utils.models import CommonHTTPException, TokenData
-from app.pkg.postgresql import get_session
+from app.pkg.postgresql import get_session, settings
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(tokenUrl="token")
 

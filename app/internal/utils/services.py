@@ -28,8 +28,7 @@ async def get_or_create_user(session: AsyncSession, nickname: str, openid: str):
     return new_user
 
 
-async def get_user(nickname: str):
-    session = get_session()
+async def get_user(nickname: str, session: AsyncSession = Depends(get_session)):
     user = await session.execute(select(User).where(User.nickname == nickname))
     if user := user.scalars().all():
         user = user.first()

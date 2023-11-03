@@ -9,4 +9,6 @@ async def get_or_create_user(session: AsyncSession, nickname: str, ):
         return res
     new_user = User(nickname=nickname)
     session.add(new_user)
+    await session.commit()
+    await session.refresh(new_user)
     return new_user

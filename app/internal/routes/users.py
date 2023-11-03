@@ -39,8 +39,8 @@ async def auth(request: Request, session: AsyncSession = Depends(get_session)):
         token = await client.authorize_access_token(request)
         user = await client.userinfo(token=token)
         request.session["user"] = dict(user)
-        res = await  get_or_create_user(session, request.session['user']['nickname'][0])
-        print(res)
+        res = await  get_or_create_user(session, request.session['user']['nickname'])
+        print(res.id)
         return RedirectResponse(url="/")
     except OAuthError as e:
         return JSONResponse({"error": "OAuth error", "message": str(e)})

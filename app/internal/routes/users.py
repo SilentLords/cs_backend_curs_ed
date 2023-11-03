@@ -4,7 +4,7 @@ from starlette.responses import RedirectResponse, JSONResponse
 
 from fastapi import FastAPI, Depends, HTTPException, APIRouter
 from authlib.integrations.starlette_client import OAuthError
-from app.internal.models.user import users
+from app.internal.models.user import User
 from app.configuration.settings import settings
 from app.internal.utils.oauth import register_oauth
 from app.internal.utils.services import get_or_create_user

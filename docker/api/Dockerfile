@@ -11,7 +11,7 @@ RUN apt-get upgrade --yes
 RUN apt-get install --yes libpq-dev
 
 RUN pip install -r requirements.txt
-
+RUN pip install alembic
 RUN  #pip install "git+git://github.com/samuelcolvin/pydantic@master#egg=pydantic[email,typing_extensions]"
 COPY . .
 EXPOSE 8000

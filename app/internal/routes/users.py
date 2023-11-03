@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Annotated
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
@@ -9,7 +10,7 @@ from authlib.integrations.starlette_client import OAuthError
 from app.internal.models.user import User
 from app.configuration.settings import settings
 from app.internal.utils.oauth import register_oauth
-from app.internal.utils.services import get_or_create_user, create_access_token
+from app.internal.utils.services import get_or_create_user, create_access_token, get_current_active_user
 from app.pkg.postgresql import get_session
 from fastapi.security import OAuth2PasswordBearer
 
@@ -36,8 +37,10 @@ async def login(request: Request):
     print(redirect_uri)
     return await oauth.create_client("Client_cs2").authorize_redirect(request, redirect_uri, redirect_popup=True)
 
-# @router.get("/me")
-# async def get_me()
+
+@router.get("/me")
+async def get_me(current_user: Annotated[User, Depends(get_current_active_user)]):
+    return current_user
 
 @router.get("/login/callback")
 async def auth(request: Request, session: AsyncSession = Depends(get_session)):

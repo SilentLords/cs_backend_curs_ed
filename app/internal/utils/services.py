@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
+from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -27,7 +28,7 @@ async def get_or_create_user(session: AsyncSession, nickname: str, openid: str):
     return new_user
 
 
-async def get_user(nickname:str):
+async def get_user(nickname: str):
     session = get_session()
     user = await session.execute(select(User).where(User.nickname == nickname))
     if user := user.scalars().all():
@@ -65,3 +66,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     if user is None:
         raise credentials_exception
     return user
+
+
+async def get_current_active_user(
+        current_user: Annotated[User, Depends(get_current_user)]
+):
+    return current_user

@@ -49,7 +49,7 @@ async def auth(request: Request, session: AsyncSession = Depends(get_session)):
         token = await client.authorize_access_token(request)
         user = await client.userinfo(token=token)
         request.session["user"] = dict(user)
-        res = await  get_or_create_user(session, request.session['user']['nickname'], request.session['user']['guid'])
+        res = await get_or_create_user(session, request.session['user']['nickname'], request.session['user']['guid'])
         print(res)
         access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
         access_token = create_access_token(

@@ -8,6 +8,7 @@ import typer
 
 app = typer.Typer()
 
+
 #
 # @app.command()
 # def hello(name: str):
@@ -21,7 +22,7 @@ app = typer.Typer()
 #     else:
 #         print(f"Bye {name}!")
 @app.command()
-def db_init_models():
+def db_init_models(name: str):
     asyncio.run(init_models())
     print("Done")
 

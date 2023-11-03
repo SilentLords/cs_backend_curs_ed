@@ -1,7 +1,9 @@
 from datetime import timedelta
 from typing import Annotated
 
+from jose import jwt, JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, JSONResponse
 
@@ -9,9 +11,10 @@ from fastapi import FastAPI, Depends, HTTPException, APIRouter
 from authlib.integrations.starlette_client import OAuthError
 from app.internal.models.user import User
 from app.configuration.settings import settings
+from app.internal.utils.models import CommonHTTPException, TokenData
 from app.internal.utils.oauth import register_oauth
 from app.internal.utils.services import get_or_create_user, create_access_token, get_current_active_user, \
-    get_current_user
+    get_current_user, get_user
 from app.pkg.postgresql import get_session
 from fastapi.security import OAuth2PasswordBearer
 
@@ -40,9 +43,25 @@ async def login(request: Request):
 
 
 @router.get("/me")
-async def get_me( session: AsyncSession = Depends(get_session)):
-    current_user = await get_current_user(session)
-    return current_user
+async def get_me(session: AsyncSession = Depends(get_session), token: str = Depends(oauth2_scheme), ):
+    credentials_exception = CommonHTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except JWTError:
+        raise credentials_exception
+    user = await get_user(session=session, nickname=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user
+
 
 @router.get("/login/callback")
 async def auth(request: Request, session: AsyncSession = Depends(get_session)):

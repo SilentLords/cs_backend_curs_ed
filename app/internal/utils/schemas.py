@@ -32,7 +32,7 @@ class TokenData(BaseModel):
 
 
 class UserBase(BaseModel):
-    username: str | None = None
+    nickname: str | None = None
 
 
 class User(UserBase):

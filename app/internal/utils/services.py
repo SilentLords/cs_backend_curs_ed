@@ -99,6 +99,7 @@ async def fetch_data_from_external_api(path: str, q_param: dict = None, ):
         response = await client.get("https://open.faceit.com/data/v4/",
                                     params=q_param, headers=headers)
 
+        print(response.json())
         if response.status_code == 200:
             return response.json()
         else:

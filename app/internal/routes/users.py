@@ -53,7 +53,7 @@ async def get_me(session: AsyncSession = Depends(get_session), token: str = Depe
 @router.get('/statistic')
 async def get_statistic(session: AsyncSession = Depends(get_session), token: str = Depends(oauth2_scheme), ):
     user = await check_auth_user(token=token, session=session)
-    statistic = await collect_statistics(user['nickname'], user['openid'])
+    statistic = await collect_statistics(user.nickname, user.openid)
     return statistic
 
 

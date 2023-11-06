@@ -29,3 +29,13 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+
+
+class UserBase(BaseModel):
+    username: str | None = None
+
+
+class User(UserBase):
+    id: int | None = None
+    class Config:
+        orm_mode = True

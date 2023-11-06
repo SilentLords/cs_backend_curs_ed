@@ -5,13 +5,12 @@ from fastapi import Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-
 from app.internal.models.user import *
 from fastapi.security import OAuth2PasswordBearer
 
 from jose import jwt, JWTError
 
-from app.internal.utils.models import CommonHTTPException, TokenData
+from app.internal.utils.schemas import CommonHTTPException, TokenData
 from app.pkg.postgresql import get_session, settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -71,3 +70,23 @@ async def get_current_active_user(
         current_user: Annotated[User, Depends(get_current_user)]
 ):
     return current_user
+
+
+def check_auth_user(token: str, session: AsyncSession):
+    credentials_exception = CommonHTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except JWTError:
+        raise credentials_exception
+    user = await get_user(session=session, nickname=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return user

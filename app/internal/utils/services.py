@@ -72,7 +72,7 @@ async def get_current_active_user(
     return current_user
 
 
-def check_auth_user(token: str, session: AsyncSession):
+async def check_auth_user(token: str, session: AsyncSession):
     credentials_exception = CommonHTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

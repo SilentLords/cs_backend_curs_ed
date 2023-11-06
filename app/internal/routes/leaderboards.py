@@ -1,8 +1,7 @@
 import httpx
 from fastapi import APIRouter
 
-from app import settings
-from app.internal.utils.services import fetch_data_from_external_api
+from app.internal.utils.services import fetch_data_from_external_api, settings
 
 router = APIRouter(
     prefix='/api/v1/leaderboard'

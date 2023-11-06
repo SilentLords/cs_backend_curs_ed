@@ -43,12 +43,10 @@ async def login(request: Request):
     return await oauth.create_client("Client_cs2").authorize_redirect(request, redirect_uri, redirect_popup=True)
 
 
-@router.get("/me")
+@router.get("/me", response_model=schemas.User)
 async def get_me(session: AsyncSession = Depends(get_session), token: str = Depends(oauth2_scheme), ) -> schemas.User:
     user = await check_auth_user(token=token, session=session)
-    print(user)
-    response_user = schemas.User(**user)
-    return response_user
+    return user
 
 
 @router.get('/statistic')

@@ -46,7 +46,7 @@ async def login(request: Request):
 @router.get("/me", response_model=schemas.User)
 async def get_me(session: AsyncSession = Depends(get_session), token: str = Depends(oauth2_scheme), ) -> schemas.User:
     user = await check_auth_user(token=token, session=session)
-    print(str(user))
+    print(user.dict())
     return user
 
 

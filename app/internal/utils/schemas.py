@@ -37,5 +37,20 @@ class UserBase(BaseModel):
 
 class User(UserBase):
     id: int | None = None
+
     class Config:
         orm_mode = True
+
+
+class Statistic(BaseModel):
+    nickname: str | None = None
+    rating_rang: int = 0
+    matches_per_month: int = 0
+    matches_win_per_month: int = 0
+    matches_per_all_month: int = 0
+    win_rate: float = 0
+    faceit_points: float = 0
+    longest_win_streak: int = 0
+    hs_percent : float = 0
+    k_r_avg_segments: float = 0
+    k_d_avg_segments: float = 0

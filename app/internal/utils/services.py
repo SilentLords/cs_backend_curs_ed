@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Annotated
 
+import httpx
 from fastapi import Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +11,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from jose import jwt, JWTError
 
-from app.internal.utils.schemas import CommonHTTPException, TokenData
+from app.internal.utils.schemas import CommonHTTPException, TokenData, Statistic
 from app.pkg.postgresql import get_session, settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -90,3 +91,27 @@ async def check_auth_user(token: str, session: AsyncSession):
     if user is None:
         raise credentials_exception
     return user
+
+
+async def fetch_data_from_external_api(path: str, q_param: dict = None, ):
+    headers = {'accept': 'application/json', 'Authorization': f'Bearer {settings.faceit_api_key}'}
+    async with httpx.AsyncClient() as client:
+        response = await client.get("https://open.faceit.com/data/v4/",
+                                    params=q_param, headers=headers)
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return None
+
+
+async def get_rating_place(nickname: str, player_id: str):
+    data = await fetch_data_from_external_api(path=f'leaderboards/{settings.leaderboard_id}/players/{player_id}')
+    return data['position']
+
+
+async def collect_statistics(nickname: str, user_id: str) -> Statistic:
+    player_id = user_id
+    rating_place = await get_rating_place(nickname, player_id)
+    stats = Statistic(rating_rang=rating_place)
+    return stats

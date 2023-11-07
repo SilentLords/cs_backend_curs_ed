@@ -175,7 +175,8 @@ async def collect_statistics(nickname: str, user_id: str) -> Statistic:
     k_d_avg_segments = await get_life_time_stats(player_id, 'K/D Ratio')
     faceit_points = await get_faceit_points(player_id, nickname)
 
-    stats = Statistic(rating_rang=rating_place,
+    stats = Statistic(nickname=nickname,
+                      rating_rang=rating_place,
                       matches_win_per_month=matches_win_per_month,
                       matches_per_month=matches_per_month,
                       matches_per_all_month=matches_per_all_month,

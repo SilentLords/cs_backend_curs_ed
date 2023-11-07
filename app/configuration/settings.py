@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     oauth_authorize_redirect_path: str = "https://cs2-backend.evom.dev/api/v1/users/login/callback"
     faceit_api_key: str = "2a4e3640-5b2f-41a8-9be4-756476cfa0d6"
     leaderboard_id: str = "651da31af3e96d2044a35366"
+    game_id: str =  ''
     # JWT
     jwt_secret_key: str = "9f63d3214da92c45a40d3866a5fb93e998afca753a557fee0de7ba8d6551767c"
     jwt_algorithm: str = 'HS256'

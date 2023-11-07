@@ -74,9 +74,9 @@ async def auth(request: Request, session: AsyncSession = Depends(get_session)):
         access_token = create_access_token(
             data={"sub": request.session['user']['nickname']}, expires_delta=access_token_expires
         )
-        redirect_uri ='/'
+        redirect_uri = '/'
         if request.session.get('redirect_uri'):
-            redirect_uri =  request.session.get('redirect_uri')
+            redirect_uri = request.session.get('redirect_uri')
         return RedirectResponse(url=f"{redirect_uri}?token={access_token}")
     except OAuthError as e:
         return JSONResponse({"error": "OAuth error", "message": str(e)})

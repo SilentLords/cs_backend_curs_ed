@@ -134,31 +134,46 @@ async def get_matches_win_per_month(nickname: str, player_id: str):
     return 0
 
 
-
 async def get_life_time_stats(player_id: str, field_name):
     data = await fetch_data_from_external_api(path=f'/players/{player_id}/stats/{settings.game_id}')
     if data:
-        return len(data['lifetime']['????'])
+        return len(data['lifetime'][field_name])
     return 0
-### НЕ ПОНЕЛ ГДЕ ИСКАТЬ
-# async def get_faceit_points(player_id: str):
-#     data = await fetch_data_from_external_api(path=f'/players/{player_id}/stats/{settings.game_id}')
-#     if data:
-#         return len(data['lifetime']['????'])
-#     return 0
+
+
+async def get_k_r_percent(player_id: str):
+    data = await fetch_data_from_external_api(path=f'/players/{player_id}/stats/{settings.game_id}')
+    if data:
+        sum_k_r = 0
+        count = 0
+        for segment in data['segments']:
+            sum_k_r += segment['Average K/R Ratio']
+            count += 1
+        return sum_k_r / count
+    return 0
+
+
+## НЕ ПОНЕЛ ГДЕ ИСКАТЬ
+async def get_faceit_points(player_id: str, nickname: str):
+    data = await fetch_data_from_external_api(path=f'players?nickname=evom_game', q_param={'nickname': nickname})
+    if data:
+        if 'cs2' in data['games'].keys():
+            return data['games']['cs2']['faceit_elo']
+    return 0
+
 
 async def collect_statistics(nickname: str, user_id: str) -> Statistic:
     player_id = user_id
     rating_place = await get_rating_place(nickname, player_id)
     matches_per_month = await get_matches_per_month(nickname, player_id)
     matches_win_per_month = await get_matches_win_per_month(nickname, player_id)
-    matches_per_all_month = await get_life_time_stats(player_id, '')
-    win_rate = await get_life_time_stats(player_id, '')
-    longest_win_streak = await get_life_time_stats(player_id, '')
-    hs_percent = await get_life_time_stats(player_id, '')
-    k_r_avg_segments = await get_life_time_stats(player_id, '')
-    k_d_avg_segments = await get_life_time_stats(player_id, '')
-    #faceit_points = await get_faceit_points(player_id)
+    matches_per_all_month = await get_life_time_stats(player_id, 'Matches')
+    win_rate = await get_life_time_stats(player_id, 'Win Rate %')
+    longest_win_streak = await get_life_time_stats(player_id, 'Longest Win Streak')
+    hs_percent = await get_life_time_stats(player_id, 'Total Headshots %')
+    k_r_avg_segments = await get_k_r_percent(player_id, )
+    k_d_avg_segments = await get_life_time_stats(player_id, 'K/D Ratio')
+    faceit_points = await get_faceit_points(player_id, nickname)
 
     stats = Statistic(rating_rang=rating_place,
                       matches_win_per_month=matches_win_per_month,
@@ -168,8 +183,8 @@ async def collect_statistics(nickname: str, user_id: str) -> Statistic:
                       longest_win_streak=longest_win_streak,
                       hs_percent=hs_percent,
                       k_r_avg_segments=k_r_avg_segments,
-                      k_d_avg_segments=k_d_avg_segments
-
+                      k_d_avg_segments=k_d_avg_segments,
+                      faceit_points=faceit_points
                       )
 
     return stats

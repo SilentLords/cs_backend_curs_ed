@@ -12,7 +12,7 @@ from authlib.integrations.starlette_client import OAuthError
 from app.internal.models.user import User
 from app.configuration.settings import settings
 from app.internal.utils import schemas
-from app.internal.utils.schemas import CommonHTTPException, TokenData
+from app.internal.utils.schemas import CommonHTTPException, TokenData, Statistic
 from app.internal.utils.oauth import register_oauth
 from app.internal.utils.services import get_or_create_user, create_access_token, get_current_active_user, \
     get_current_user, get_user, check_auth_user, collect_statistics
@@ -51,9 +51,11 @@ async def get_me(session: AsyncSession = Depends(get_session), token: str = Depe
 
 
 @router.get('/statistic')
-async def get_statistic(session: AsyncSession = Depends(get_session), token: str = Depends(oauth2_scheme), ):
+async def get_statistic(session: AsyncSession = Depends(get_session),
+                        token: str = Depends(oauth2_scheme), ) -> Statistic:
     user = await check_auth_user(token=token, session=session)
-    statistic = await collect_statistics(user.nickname, user.openid)
+    print(user)
+    statistic = await collect_statistics(nickname=user.nickname, user_id=user.openid)
     return statistic
 
 

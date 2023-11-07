@@ -37,10 +37,12 @@ async def home(request: Request):
 
 
 @router.get("/login")
-async def login(request: Request):
-    redirect_uri = settings.oauth_authorize_redirect_path
-    print(redirect_uri)
-    return await oauth.create_client("Client_cs2").authorize_redirect(request, redirect_uri, redirect_popup=True)
+async def login(request: Request, redirect_uri: str):
+    redirect_callback_uri = settings.oauth_authorize_redirect_path
+    request.session["redirect_uri"] = redirect_uri
+    print(redirect_callback_uri)
+    return await oauth.create_client("Client_cs2").authorize_redirect(request, redirect_callback_uri,
+                                                                      redirect_popup=True)
 
 
 @router.get("/me", response_model=schemas.User)
@@ -72,7 +74,10 @@ async def auth(request: Request, session: AsyncSession = Depends(get_session)):
         access_token = create_access_token(
             data={"sub": request.session['user']['nickname']}, expires_delta=access_token_expires
         )
-        return RedirectResponse(url=f"/?token={access_token}")
+        redirect_uri ='/'
+        if request.session.get('redirect_uri'):
+            redirect_uri =  request.session.get('redirect_uri')
+        return RedirectResponse(url=f"{redirect_uri}?token={access_token}")
     except OAuthError as e:
         return JSONResponse({"error": "OAuth error", "message": str(e)})
 

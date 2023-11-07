@@ -19,7 +19,7 @@ def create_app(_=None) -> FastAPI:
     app = FastAPI()
     app_ = Server(app).get_class()
     app_.add_middleware(SessionMiddleware, secret_key="your-secret-key")
-    app_.add_middleware(CORSMiddleware, allow_origins=["*"], secret_key="your-secret-key")
+    app_.add_middleware(CORSMiddleware, allow_origins=["*"])
     return Server(app).get_class()
 
 

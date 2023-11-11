@@ -19,14 +19,8 @@ app_: FastAPI
 
 def create_app(_=None) -> FastAPI:
     global app_
-    app = FastAPI()
-    app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-    )
+    
+    app = FastAPI(middleware=[Middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])])
     app_ = Server(app).get_class()
     app_.add_middleware(SessionMiddleware, secret_key="your-secret-key")
     return Server(app).get_class()

@@ -48,6 +48,7 @@ async def login(request: Request, redirect_uri: str):
 @router.get("/me", response_model=schemas.User)
 async def get_me(session: AsyncSession = Depends(get_session), token: str = Depends(oauth2_scheme), ) -> schemas.User:
     user = await check_auth_user(token=token, session=session)
+    user.statistic = await collect_statistics(nickname=user.nickname, user_id=user.openid)
     # print(user)
     return user
 

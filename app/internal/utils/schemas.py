@@ -31,17 +31,6 @@ class TokenData(BaseModel):
     username: str | None = None
 
 
-class UserBase(BaseModel):
-    nickname: str | None = None
-
-
-class User(UserBase):
-    id: int | None = None
-
-    class Config:
-        orm_mode = True
-
-
 class Statistic(BaseModel):
     nickname: str | None = None
     rating_rang: int = 0
@@ -51,6 +40,18 @@ class Statistic(BaseModel):
     win_rate: float = 0
     faceit_points: float = 0
     longest_win_streak: int = 0
-    hs_percent : float = 0
+    hs_percent: float = 0
     k_r_avg_segments: float = 0
     k_d_avg_segments: float = 0
+
+
+class UserBase(BaseModel):
+    nickname: str | None = None
+
+
+class User(UserBase):
+    id: int | None = None
+    stats: Statistic | None = None
+
+    class Config:
+        orm_mode = True

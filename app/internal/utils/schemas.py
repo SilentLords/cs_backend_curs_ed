@@ -31,7 +31,13 @@ class TokenData(BaseModel):
     username: str | None = None
 
 
-class Statistic(BaseModel):
+class BaseStatistic(BaseModel):
+    hs_percent: float = 0
+    k_d_avg_segments: float = 0
+    kills: int = 0
+
+
+class Statistic(BaseStatistic):
     nickname: str | None = None
     rating_rang: int = 0
     matches_per_month: int = 0
@@ -40,9 +46,7 @@ class Statistic(BaseModel):
     win_rate: float = 0
     faceit_points: float = 0
     longest_win_streak: int = 0
-    hs_percent: float = 0
     k_r_avg_segments: float = 0
-    k_d_avg_segments: float = 0
 
 
 class UserBase(BaseModel):

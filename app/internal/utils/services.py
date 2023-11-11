@@ -11,7 +11,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from jose import jwt, JWTError
 
-from app.internal.utils.schemas import CommonHTTPException, TokenData, Statistic
+from app.internal.utils.schemas import CommonHTTPException, TokenData, Statistic, BaseStatistic
 from app.pkg.postgresql import get_session, settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -134,15 +134,15 @@ async def get_matches_win_per_month(nickname: str, player_id: str):
     return 0
 
 
-async def get_life_time_stats(player_id: str, field_name):
-    data = await fetch_data_from_external_api(path=f'players/{player_id}/stats/{settings.game_id}')
+async def get_life_time_stats(player_id: str, field_name: str, data: dict) -> float:
+    # data = await fetch_data_from_external_api(path=f'players/{player_id}/stats/{settings.game_id}')
     if data:
         return len(data['lifetime'][field_name])
     return 0
 
 
-async def get_k_r_percent(player_id: str) -> float:
-    data = await fetch_data_from_external_api(path=f'players/{player_id}/stats/{settings.game_id}')
+async def get_k_r_percent(player_id: str, data) -> float:
+    # data = await fetch_data_from_external_api(path=f'players/{player_id}/stats/{settings.game_id}')
 
     if data:
         sum_k_r = 0
@@ -163,17 +163,39 @@ async def get_faceit_points(player_id: str, nickname: str):
     return 0
 
 
+async def get_mounts_kills(player_id: str, data: dict) -> int:
+    if data:
+        sum_kills = 0
+        count = 0
+        for segment in data['segments']:
+            sum_kills += int(segment['stats']['Kills'])
+        return sum_kills
+    return 0
+
+
+async def collect_base_statistics(nickname: str, user_id: str) -> BaseStatistic:
+    player_id = user_id
+    data_for_stats = await fetch_data_from_external_api(path=f'players/{player_id}/stats/{settings.game_id}')
+    k_d_avg_segments = await get_life_time_stats(player_id, 'K/D Ratio', data=data_for_stats)
+    hs_percent = await get_life_time_stats(player_id, 'Total Headshots %', data=data_for_stats)
+    kills = get_mounts_kills(player_id, data=data_for_stats)
+    return BaseStatistic(k_d_avg_segments=k_d_avg_segments, hs_percent=hs_percent, kills=kills)
+
+
 async def collect_statistics(nickname: str, user_id: str) -> Statistic:
     player_id = user_id
+    data_for_stats = await fetch_data_from_external_api(path=f'players/{player_id}/stats/{settings.game_id}')
+
     rating_place = await get_rating_place(nickname, player_id)
     matches_per_month = await get_matches_per_month(nickname, player_id)
     matches_win_per_month = await get_matches_win_per_month(nickname, player_id)
-    matches_per_all_month = await get_life_time_stats(player_id, 'Matches')
-    win_rate = await get_life_time_stats(player_id, 'Win Rate %')
-    longest_win_streak = await get_life_time_stats(player_id, 'Longest Win Streak')
-    hs_percent = await get_life_time_stats(player_id, 'Total Headshots %')
-    k_r_avg_segments = await get_k_r_percent(player_id, )
-    k_d_avg_segments = await get_life_time_stats(player_id, 'K/D Ratio')
+    matches_per_all_month = await get_life_time_stats(player_id, 'Matches', data=data_for_stats)
+    win_rate = await get_life_time_stats(player_id, 'Win Rate %', data=data_for_stats)
+    longest_win_streak = await get_life_time_stats(player_id, 'Longest Win Streak', data=data_for_stats)
+    hs_percent = await get_life_time_stats(player_id, 'Total Headshots %', data=data_for_stats)
+    k_r_avg_segments = await get_k_r_percent(player_id, data=data_for_stats)
+    k_d_avg_segments = await get_life_time_stats(player_id, 'K/D Ratio', data=data_for_stats)
+    kills = await get_life_time_stats(player_id, 'Kills', data=data_for_stats)
     faceit_points = await get_faceit_points(player_id, nickname)
 
     stats = Statistic(nickname=nickname,
@@ -186,7 +208,8 @@ async def collect_statistics(nickname: str, user_id: str) -> Statistic:
                       hs_percent=hs_percent,
                       k_r_avg_segments=k_r_avg_segments,
                       k_d_avg_segments=k_d_avg_segments,
-                      faceit_points=faceit_points
+                      faceit_points=faceit_points,
+                      kills=kills
                       )
 
     return stats

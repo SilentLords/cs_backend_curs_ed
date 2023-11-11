@@ -114,14 +114,14 @@ async def get_rating_place(nickname: str, player_id: str):
 
 
 async def get_matches_per_month(nickname: str, player_id: str):
-    data = await fetch_data_from_external_api(q_param={'game': settings.game_id}, path=f'/players/{player_id}/history')
+    data = await fetch_data_from_external_api(q_param={'game': settings.game_id}, path=f'players/{player_id}/history')
     if data:
         return len(data['items'])
     return 0
 
 
 async def get_matches_win_per_month(nickname: str, player_id: str):
-    data = await fetch_data_from_external_api(q_param={'game': settings.game_id}, path=f'/players/{player_id}/history')
+    data = await fetch_data_from_external_api(q_param={'game': settings.game_id}, path=f'players/{player_id}/history')
     if data:
         win = 0
         for game in data['items']:
@@ -135,14 +135,14 @@ async def get_matches_win_per_month(nickname: str, player_id: str):
 
 
 async def get_life_time_stats(player_id: str, field_name):
-    data = await fetch_data_from_external_api(path=f'/players/{player_id}/stats/{settings.game_id}')
+    data = await fetch_data_from_external_api(path=f'players/{player_id}/stats/{settings.game_id}')
     if data:
         return len(data['lifetime'][field_name])
     return 0
 
 
 async def get_k_r_percent(player_id: str):
-    data = await fetch_data_from_external_api(path=f'/players/{player_id}/stats/{settings.game_id}')
+    data = await fetch_data_from_external_api(path=f'players/{player_id}/stats/{settings.game_id}')
     if data:
         sum_k_r = 0
         count = 0

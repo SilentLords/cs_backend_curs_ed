@@ -54,11 +54,11 @@ async def get_me(session: AsyncSession = Depends(get_session), token: str = Depe
 
 @router.get('/statistic')
 async def get_statistic(session: AsyncSession = Depends(get_session),
-                        token: str = Depends(oauth2_scheme), ) -> Statistic:
+                        token: str = Depends(oauth2_scheme), ) -> schemas.CommonResponse:
     user = await check_auth_user(token=token, session=session)
     print("Nickname:", user.nickname)
     statistic = await collect_statistics(nickname=user.nickname, user_id=user.openid)
-    return statistic
+    return schemas.CommonResponse(content=schemas.Content(messsage='fetch done', result=statistic))
 
 
 @router.get("/login/callback")

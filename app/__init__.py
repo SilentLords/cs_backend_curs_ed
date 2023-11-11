@@ -3,6 +3,7 @@ import asyncio
 import typer as typer
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
+from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -16,10 +17,9 @@ app_: FastAPI
 
 def create_app(_=None) -> FastAPI:
     global app_
-    app = FastAPI()
+    app = FastAPI(middleware=[Middleware(CORSMiddleware, allow_origins=["*"])])
     app_ = Server(app).get_class()
     app_.add_middleware(SessionMiddleware, secret_key="your-secret-key")
-    app_.add_middleware(CORSMiddleware, allow_origins=["*"])
     return Server(app).get_class()
 
 

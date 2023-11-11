@@ -178,7 +178,7 @@ async def collect_base_statistics(nickname: str, user_id: str) -> BaseStatistic:
     data_for_stats = await fetch_data_from_external_api(path=f'players/{player_id}/stats/{settings.game_id}')
     k_d_avg_segments = await get_life_time_stats(player_id, 'K/D Ratio', data=data_for_stats)
     hs_percent = await get_life_time_stats(player_id, 'Total Headshots %', data=data_for_stats)
-    kills = get_mounts_kills(player_id, data=data_for_stats)
+    kills = await get_mounts_kills(player_id, data=data_for_stats)
     return BaseStatistic(k_d_avg_segments=k_d_avg_segments, hs_percent=hs_percent, kills=kills)
 
 

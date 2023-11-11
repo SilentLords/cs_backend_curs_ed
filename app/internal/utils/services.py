@@ -96,7 +96,7 @@ async def check_auth_user(token: str, session: AsyncSession):
 async def fetch_data_from_external_api(path: str, q_param: dict = None, ):
     headers = {'accept': 'application/json', 'Authorization': f'Bearer {settings.faceit_api_key}'}
     async with httpx.AsyncClient() as client:
-        response = await client.get("https://open.faceit.com/data/v4/",
+        response = await client.get(f"https://open.faceit.com/data/v4/{path}",
                                     params=q_param, headers=headers)
 
         print(response.json())

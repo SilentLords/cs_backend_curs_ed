@@ -141,14 +141,14 @@ async def get_life_time_stats(player_id: str, field_name):
     return 0
 
 
-async def get_k_r_percent(player_id: str):
+async def get_k_r_percent(player_id: str) -> float:
     data = await fetch_data_from_external_api(path=f'players/{player_id}/stats/{settings.game_id}')
 
     if data:
         sum_k_r = 0
         count = 0
         for segment in data['segments']:
-            sum_k_r += segment['stats']['Average K/R Ratio']
+            sum_k_r += float(segment['stats']['Average K/R Ratio'])
             count += 1
         return sum_k_r / count
     return 0

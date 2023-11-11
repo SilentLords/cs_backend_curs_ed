@@ -10,6 +10,6 @@ router = APIRouter(
 
 
 @router.get('/')
-async def get_leaderboard(offset: int, limit: int = 20) -> CommonResponse:
+async def get_leaderboard(offset: int, limit: int = 20):
     q_param = {'offset': offset, "limit": limit}
-    return  CommonResponse(content=Content(messsage='fetch done', result = await fetch_data_from_external_api(q_param=q_param, path=f'leaderboards/{settings.leaderboard_id}')))
+    return await fetch_data_from_external_api(q_param=q_param, path=f'leaderboards/{settings.leaderboard_id}')

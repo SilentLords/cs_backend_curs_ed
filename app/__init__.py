@@ -4,8 +4,8 @@ import typer as typer
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
-from fastapi.middleware.cors import CORSMiddleware as Fastcors
+from fastapi.middleware.cors import CORSMiddleware
+
 
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -21,11 +21,11 @@ def create_app(_=None) -> FastAPI:
     global app_
     app = FastAPI()
     app.add_middleware(
-        Fastcors,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
     )
     app_ = Server(app).get_class()
     app_.add_middleware(SessionMiddleware, secret_key="your-secret-key")

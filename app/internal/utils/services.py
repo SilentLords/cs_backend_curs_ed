@@ -128,7 +128,7 @@ async def get_matches_win_per_month(nickname: str, player_id: str):
             winner = game['results']['winner']
             for team in game['teams'].keys():
                 for player in game['teams'][team]['players']:
-                    if player['player_id'] == player_id and winner == team['nickname']:
+                    if player['player_id'] == player_id and winner == game['teams']['team']['nickname']:
                         win += 1
         return win
     return 0

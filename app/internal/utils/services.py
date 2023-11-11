@@ -195,7 +195,7 @@ async def collect_statistics(nickname: str, user_id: str) -> Statistic:
     hs_percent = await get_life_time_stats(player_id, 'Total Headshots %', data=data_for_stats)
     k_r_avg_segments = await get_k_r_percent(player_id, data=data_for_stats)
     k_d_avg_segments = await get_life_time_stats(player_id, 'K/D Ratio', data=data_for_stats)
-    kills = await get_life_time_stats(player_id, 'Kills', data=data_for_stats)
+    # kills = await get_life_time_stats(player_id, 'Kills', data=data_for_stats)
     faceit_points = await get_faceit_points(player_id, nickname)
 
     stats = Statistic(nickname=nickname,
@@ -209,7 +209,6 @@ async def collect_statistics(nickname: str, user_id: str) -> Statistic:
                       k_r_avg_segments=k_r_avg_segments,
                       k_d_avg_segments=k_d_avg_segments,
                       faceit_points=faceit_points,
-                      kills=kills
                       )
 
     return stats

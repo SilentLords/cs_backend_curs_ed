@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cs-backend-service
+spec:
+  selector:
+    app: cs-backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8020

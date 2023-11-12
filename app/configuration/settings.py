@@ -6,6 +6,7 @@ from authlib.integrations.starlette_client import OAuth
 
 class Settings(BaseSettings):
     db_name: str = Field(..., env='DB_NAME')
+    db_host: str = Field(..., env='DB_HOST')
     db_username: str = Field(..., env='DB_USERNAME')
     db_password: str = Field(..., env='DB_PASSWORD')
     db_port: str = Field(..., env='DB_PORT')

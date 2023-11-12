@@ -10,7 +10,10 @@ ca_path = "app/certs/ca-certificate.crt"
 ssl_args = {'ssl': {'ca': ca_path}}
 SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{settings.db_username}:{settings.db_password}@db/{settings.db_name}"
 
-engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, connect_args=ssl_args)
+if settings.is_prod:
+    engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, connect_args=ssl_args)
+else:
+    engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

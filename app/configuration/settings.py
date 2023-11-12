@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     db_password: str = Field(..., env='DB_PASSWORD')
     db_port: str = Field(..., env='DB_PORT')
     celery_backend_url: str = Field(..., env='CELERY_BACKEND_URL')
+    is_prod: bool = Field(..., env='PROD')
     oauth_client_id: str = "cb0ff22f-2a68-4c58-97dc-fb2e50c06831"
     oauth_client_secret: str = "9ne2aL8JR1T8htrwMzKFmvt6FHnGTQPlHok6ytz4"
     oauth_authorize_redirect_path: str = "https://cs2-backend.evom.dev/api/v1/users/login/callback"

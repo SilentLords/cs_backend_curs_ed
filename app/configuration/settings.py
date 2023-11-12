@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     oauth_client_secret: str = Field(..., env='OAUTH_CLIENT_SECRET')
     oauth_authorize_redirect_path: str = Field(..., env='OAUTH_AUTHORIZE_REDIRECT_PATH')
     faceit_api_key: str = Field(..., env='FACEIT_API_KEY')
-    leaderboard_id: str = "651da31af3e96d2044a35366"
+    leaderboard_id: str = Field(..., env='LEADERBOARD_ID')
     game_id: str =  'cs2'
     jwt_secret_key: str = Field(..., env='JWT_SECRET_KEY')
     jwt_algorithm: str = 'HS256'

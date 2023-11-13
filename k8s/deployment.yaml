@@ -18,7 +18,7 @@ spec:
           ports:
             - containerPort: 8020
           volumeMounts:
-            - name: api-pv
+            - name: api-volume
               mountPath: /app
       volumes:
         - name: api-volume

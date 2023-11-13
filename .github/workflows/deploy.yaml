@@ -35,12 +35,13 @@ jobs:
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f k8s/deployment.yaml
 
+      - name: Apply service file if there is any updates
+        run: | 
+          kubectl apply -f k8s/pvc.yaml 
+          
       - name: Verify deployment
         run: kubectl rollout status deployment/cs-backend-deployment
 
       - name: Apply service file if there is any updates
         run: | 
           kubectl apply -f k8s/service.yaml 
-      - name: Apply service file if there is any updates
-        run: | 
-          kubectl apply -f k8s/pvc.yaml 

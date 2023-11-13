@@ -21,6 +21,6 @@ spec:
             - name: api-pv
               mountPath: /app
       volumes:
-        - name: api-pv
+        - name: api-volume
           persistentVolumeClaim:
-            claimName: api-pv
+            claimName: api-pvc

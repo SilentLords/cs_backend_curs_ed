@@ -58,4 +58,4 @@ class User(UserBase):
     stats: Statistic | None = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True

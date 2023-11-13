@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: cs-backend
-          image: IMAGE # Replace with your actual image
+          image: IMAGE 
           ports:
             - containerPort: 8020
           volumeMounts:

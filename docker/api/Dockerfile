@@ -5,7 +5,7 @@ WORKDIR ../../app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 RUN ls
-COPY ./api/requirements.txt .
+COPY api/requirements.txt .
 
 RUN pip install -r requirements.txt
 RUN  #pip install "git+git://github.com/samuelcolvin/pydantic@master#egg=pydantic[email,typing_extensions]"

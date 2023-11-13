@@ -45,3 +45,4 @@ jobs:
       - name: Apply service file if there is any updates
         run: | 
           kubectl apply -f k8s/service.yaml 
+          

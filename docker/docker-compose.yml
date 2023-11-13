@@ -6,7 +6,8 @@ services:
     build:
       context: .
       dockerfile: ./api/Dockerfile
-    command: uvicorn app:app_ --reload --host 0.0.0.0
+#    command: uvicorn app:app_ --reload --host 0.0.0.0
+    command: bash -c "alembic -c /app/alembic.ini upgrade head && uvicorn app:app_ --reload --host 0.0.0.0"
     volumes:
       - ../:/app
     depends_on:

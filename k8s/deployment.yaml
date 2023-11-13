@@ -18,8 +18,9 @@ spec:
           ports:
             - containerPort: 8020
           volumeMounts:
-            - name: cs-backend-volume
+            - name: api-pv
               mountPath: /app
-          envFrom:
-            - configMapRef:
-                name: cs-backend-config
+      volumes:
+        - name: api-pv
+          persistentVolumeClaim:
+            claimName: api-pv

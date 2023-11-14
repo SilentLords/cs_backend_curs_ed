@@ -22,7 +22,7 @@ from fastapi.security import OAuth2PasswordBearer
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter(
-    prefix='/api/v1/users'
+    prefix='/backend/api/v1/users'
 )
 
 oauth = register_oauth()

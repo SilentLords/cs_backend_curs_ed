@@ -17,6 +17,8 @@ class CommonResponse(Response):
     media_type = 'application/json'
     content: Content
 
+class UsersHub(BaseModel):
+    count : int
 
 class CommonHTTPException(HTTPException):
     detail: Content

@@ -11,8 +11,8 @@ import ssl
 settings = Settings()
 ca_path = "app/certs/ca-certificate.crt"
 
-my_ssl_ctx = ssl.create_default_context(cafile=ca_path)
-my_ssl_ctx.verify_mode = ssl.CERT_REQUIRED
+my_ssl_context = ssl.create_default_context(cafile=ca_path)
+my_ssl_context.verify_mode = ssl.CERT_REQUIRED
 
 # ssl_args = {'ssl_ca': ca_path} 
 ssl_args = {'ssl': {'ca': ca_path}}

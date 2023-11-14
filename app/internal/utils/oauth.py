@@ -25,13 +25,13 @@ def register_oauth() -> OAuth:
     # Конфигурация OAuth клиента для стороннего сервиса
     oauth.register(
         name='Client_cs2',
-        client_id='65a232fb-fc61-46a8-9818-aa3777269130',
-        client_secret='0h4ilhKtV8FVKBYX46Nd6112C8xpKVUWmH10piNJ',
+        client_id=settings.oauth_client_id,
+        client_secret=settings.oauth_client_secret,
         authorize_url='https://accounts.faceit.com',
         access_token_url='https://api.faceit.com/auth/v1/oauth/token',
         authorize_params=None,
         authorize_prompt=False,
-        authorize_redirect_path='https://cs2-backend.evom.dev/api/v1/users/login/callback',
+        authorize_redirect_path=settings.oauth_authorize_redirect_path,
         client_kwargs={
             'code_challenge_method': 'S256',  # Метод хэширования PKCE
             'code_challenge': code_challenge,  # PKCE хэш

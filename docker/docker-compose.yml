@@ -5,7 +5,7 @@ services:
     container_name: "${COMPOSE_PROJECT_NAME}app"
     build:
       context: .
-      dockerfile: ./api/Dockerfile
+      dockerfile: ./api/Dockerfile_dev
     command: bash -c "alembic -c /app/alembic.ini upgrade head && uvicorn app:app_ --reload --host 0.0.0.0"
 
     volumes:
@@ -22,7 +22,7 @@ services:
   worker:
     build:
       context: .
-      dockerfile: ./api/Dockerfile
+      dockerfile: ./api/DockerfileCelery_dev
     command: celery -A app.internal.celery_app.celery worker --beat --loglevel=INFO
     container_name: "${COMPOSE_PROJECT_NAME}worker"
     volumes:

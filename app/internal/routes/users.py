@@ -37,9 +37,10 @@ async def home(request: Request):
 
 
 @router.get('/hub')
-async def get_hub_count(request: Request):
+async def get_hub_count(request: Request) -> schemas.UsersHub:
     data = await fetch_data_from_external_api( path=f'hubs/8a9629cf-c837-4389-97a1-1c47cf886df4')
-    return data['players_joined']
+    r_data = schemas.UsersHub(count=data['players_joined'])
+    return r_data
 
 @router.get("/login")
 async def login(request: Request, redirect_uri: str):

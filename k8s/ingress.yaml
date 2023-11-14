@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: evom.games.ingress
+  name: cs2.game.ingress
 spec:
   tls:
   - hosts:

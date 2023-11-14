@@ -17,10 +17,3 @@ spec:
           image: IMAGE 
           ports:
             - containerPort: 8020
-          volumeMounts:
-            - name: api-celery-volume
-              mountPath: /app
-      volumes:
-        - name: api-celery-volume
-          persistentVolumeClaim:
-            claimName: api-celery-pvc

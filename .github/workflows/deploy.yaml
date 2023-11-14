@@ -1,0 +1,88 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_api:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+ 
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_TOKEN }}
+        
+      - name: Build container image
+        run: docker build -t registry.digitalocean.com/evomg-cr/cs-backend:$(echo $GITHUB_SHA | head -c7) -f docker/api/Dockerfile .
+
+      - name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 1200
+
+      - name: Update deployment file
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|IMAGE|registry.digitalocean.com/evomg-cr/cs-backend:'${TAG}'|' k8s/deployment.yaml
+
+      - name: Push image to DigitalOcean Container Registry
+        run: docker push registry.digitalocean.com/evomg-cr/cs-backend:$(echo $GITHUB_SHA | head -c7)
+
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 evomg-k8s
+
+      - name: Apply pvc file if there is any updates
+        run: | 
+          kubectl apply -f k8s/pvc.yaml 
+          
+      - name: Deploy to DigitalOcean Kubernetes
+        run: kubectl apply -f k8s/deployment.yaml
+
+      - name: Verify deployment
+        run: kubectl rollout status deployment/cs-backend-deployment
+
+      - name: Apply service file if there is any updates
+        run: | 
+          kubectl apply -f k8s/service.yaml 
+          
+  deploy_worker:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+ 
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_TOKEN }}
+        
+      - name: Build container image
+        run: docker build -t registry.digitalocean.com/evomg-cr/cs-backend-celery:$(echo $GITHUB_SHA | head -c7) -f docker/api/DockerfileCelery .
+
+      - name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 1200
+
+      - name: Update deployment file
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|IMAGE|registry.digitalocean.com/evomg-cr/cs-backend-celery:'${TAG}'|' k8s/deployment.yaml
+
+      - name: Push image to DigitalOcean Container Registry
+        run: docker push registry.digitalocean.com/evomg-cr/cs-backend-celery:$(echo $GITHUB_SHA | head -c7)
+
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 evomg-k8s
+
+      - name: Apply pvc file if there is any updates
+        run: | 
+          kubectl apply -f k8s/pvc-celery.yaml 
+          
+      - name: Deploy to DigitalOcean Kubernetes
+        run: kubectl apply -f k8s/deployment-celery.yaml
+
+      - name: Verify deployment
+        run: kubectl rollout status deployment/cs-backend-celery-deployment
+
+      - name: Apply service file if there is any updates
+        run: | 
+          kubectl apply -f k8s/service-celery.yaml 
+          

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cs-backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cs-backend
+  template:
+    metadata:
+      labels:
+        app: cs-backend
+    spec:
+      containers:
+        - name: cs-backend
+          image: IMAGE 
+          ports:
+            - containerPort: 8020
+          volumeMounts:
+            - name: api-volume
+              mountPath: /app
+      volumes:
+        - name: api-volume
+          persistentVolumeClaim:
+            claimName: api-pvc

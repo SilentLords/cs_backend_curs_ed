@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 RUN ls
 
-COPY ./api/requirements.txt .
+COPY ./docker/api/requirements.txt .
 RUN apt-get update
 RUN apt-get upgrade --yes
 RUN apt-get install --yes libpq-dev

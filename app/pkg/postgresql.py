@@ -7,7 +7,7 @@ from app.configuration.settings import Settings
 
 settings = Settings()
 ca_path = "app/certs/ca-certificate.crt"
-ssl_args = {'ssl': {'ssl_ca': ca_path}, 'sslmode':'require'}
+ssl_args = {'ssl': {'ssl_ca': ca_path}}
 SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{settings.db_username}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
 
 if settings.is_prod == "true":

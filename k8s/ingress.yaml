@@ -12,7 +12,7 @@ spec:
     http:
       paths:
       - pathType: Prefix
-        path: "/api/"
+        path: "/backend/"
         backend:
           service:
             name: cs-backend-service

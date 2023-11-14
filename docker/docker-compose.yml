@@ -2,10 +2,12 @@ version: "3.9"
 
 services:
   app:
-    container_name: app
+    container_name: "${COMPOSE_PROJECT_NAME}app"
     build:
       context: .
       dockerfile: ./api/Dockerfile
+    command: bash -c "alembic -c /app/alembic.ini upgrade head && uvicorn app:app_ --reload --host 0.0.0.0"
+
     volumes:
       - ../:/app
     depends_on:
@@ -22,6 +24,7 @@ services:
       context: .
       dockerfile: ./api/Dockerfile
     command: celery -A app.internal.celery_app.celery worker --beat --loglevel=INFO
+    container_name: "${COMPOSE_PROJECT_NAME}worker"
     volumes:
       - .:/usr/src/celery_reports
     env_file:
@@ -37,36 +40,46 @@ services:
 
   redis:
     image: redis:6-alpine
+    container_name: "${COMPOSE_PROJECT_NAME}redis"
     networks:
       - fastapi_network
   db:
     image: postgres:15.0-alpine
+    container_name: "${COMPOSE_PROJECT_NAME}db"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - env_files/.env
     environment:
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
     expose:
       - 5432
-    env_file:
-      - env_files/.env
-    networks:
-      - fastapi_network
-
-
-
-  web:
-    container_name: 'nginx'
-    image: nginx:alpine
-    depends_on:
-      - app
     ports:
-      - 80:80
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - "5444:5432"
     networks:
       - fastapi_network
+
+#  dozzle:
+#    container_name: dozzle_cs
+#    image: amir20/dozzle:latest
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#    ports:
+#      - "9999:8080"
+
+#  web:
+#    container_name: "${COMPOSE_PROJECT_NAME}-nginx"
+#    image: nginx:alpine
+#    depends_on:
+#      - app
+#    ports:
+#      - 8020:80
+#    volumes:
+#      - ./nginx:/etc/nginx/conf.d
+#    networks:
+#      - fastapi_network
 
 volumes:
   postgres_data:

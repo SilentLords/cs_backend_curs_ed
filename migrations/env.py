@@ -4,7 +4,7 @@ from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-
+from app.configuration.settings import settings
 from alembic import context
 from config import DB_NAME, DB_USERNAME, DB_PORT, DB_PASSWORD
 
@@ -68,17 +68,28 @@ def do_run_migrations(connection: Connection) -> None:
         context.run_migrations()
 
 
+
 async def run_async_migrations() -> None:
     """In this scenario we need to create an Engine
     and associate a connection with the context.
 
     """
+    ca_path = "app/certs/ca-certificate.crt"
+    my_ssl_context = ssl.create_default_context(cafile=ca_path)
+    my_ssl_context.verify_mode = ssl.CERT_REQUIRED
 
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    # ssl_args = {'ssl_ca': ca_path} 
+    ssl_args = {'ssl': {'ca': ca_path}}
+    SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{settings.db_username}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
+
+    if settings.is_prod == "true":
+        connectable = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, connect_args={"ssl": my_ssl_context})
+    else:
+        connectable = async_engine_from_config(
+                config.get_section(config.config_ini_section, {}),
+                prefix="sqlalchemy.",
+                poolclass=pool.NullPool,
+            )
 
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)

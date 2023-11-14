@@ -18,11 +18,11 @@ from app.internal.utils.services import get_or_create_user, create_access_token,
     get_current_user, get_user, check_auth_user, collect_statistics
 from app.pkg.postgresql import get_session
 from fastapi.security import OAuth2PasswordBearer
-
+from app.internal.utils.services import fetch_data_from_external_api
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter(
-    prefix='/api/v1/users'
+    prefix='/backend/api/v1/users'
 )
 
 oauth = register_oauth()
@@ -36,6 +36,10 @@ async def home(request: Request):
     return {"message": f"Привет, {request.session['user']}!"}
 
 
+@router.get('/hub')
+async def get_hub_count(request: Request):
+    data = await fetch_data_from_external_api(q_param=q_param, path=f'hubs/8a9629cf-c837-4389-97a1-1c47cf886df4')
+    return data['players_joined']
 @router.get("/login")
 async def login(request: Request, redirect_uri: str):
     redirect_callback_uri = settings.oauth_authorize_redirect_path

@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     db_password: str = Field(..., env='DB_PASSWORD')
     db_port: str = Field(..., env='DB_PORT')
     celery_backend_url: str = Field(..., env='CELERY_BACKEND_URL')
+    celery_broker_url: str = Field(..., env='CELERY_BACKEND_URL')
     is_prod: str = Field(..., env='IS_PROD')
     oauth_client_id: str = Field(..., env='OAUTH_CLIENT_ID')
     oauth_client_secret: str = Field(..., env='OAUTH_CLIENT_SECRET')

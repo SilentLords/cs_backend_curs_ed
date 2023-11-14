@@ -36,10 +36,6 @@ jobs:
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 evomg-k8s
 
-      - name: Apply pvc file if there is any updates
-        run: | 
-          kubectl apply -f k8s/pvc.yaml 
-          
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f k8s/deployment.yaml
 
@@ -84,10 +80,6 @@ jobs:
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 evomg-k8s
 
-      - name: Apply pvc file if there is any updates
-        run: | 
-          kubectl apply -f k8s/pvc-celery.yaml 
-          
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f k8s/deployment-celery.yaml
 

@@ -5,7 +5,7 @@ from app.internal.utils.schemas import CommonResponse, Content
 from app.internal.utils.services import fetch_data_from_external_api, settings, collect_statistics, collect_base_statistics
 
 router = APIRouter(
-    prefix='/api/v1/leaderboard'
+    prefix='/backend/api/v1/leaderboard'
 )
 
 

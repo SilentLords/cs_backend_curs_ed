@@ -12,8 +12,13 @@ spec:
       labels:
         app: cs-backend
     spec:
+      imagePullSecrets:
+      - name: evomg-cr
       containers:
         - name: cs-backend
           image: IMAGE 
           ports:
-            - containerPort: 8020
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+               name: cs-backend-secrets

@@ -64,7 +64,7 @@ jobs:
         run: doctl registry login --expiry-seconds 1200
 
       - name: Update deployment file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|IMAGE|registry.digitalocean.com/evomg-cr/cs-backend-celery:'${TAG}'|' k8s/deployment.yaml
+        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|IMAGE|registry.digitalocean.com/evomg-cr/cs-backend-celery:'${TAG}'|' k8s/deployment-celery.yaml
 
       - name: Push image to DigitalOcean Container Registry
         run: docker push registry.digitalocean.com/evomg-cr/cs-backend-celery:$(echo $GITHUB_SHA | head -c7)

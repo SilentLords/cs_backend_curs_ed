@@ -17,10 +17,3 @@ spec:
           image: IMAGE 
           ports:
             - containerPort: 8020
-          volumeMounts:
-            - name: api-volume
-              mountPath: /app
-      volumes:
-        - name: api-volume
-          persistentVolumeClaim:
-            claimName: api-pvc

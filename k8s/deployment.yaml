@@ -12,6 +12,8 @@ spec:
       labels:
         app: cs-backend
     spec:
+      imagePullSecrets:
+      - name: evomg-cr
       containers:
         - name: cs-backend
           image: IMAGE 

@@ -17,6 +17,6 @@ RUN pip install alembic
 RUN  #pip install "git+git://github.com/samuelcolvin/pydantic@master#egg=pydantic[email,typing_extensions]"
 COPY . .
 EXPOSE 8000
-RUN alembic -c /app/alembic.ini upgrade head
-CMD uvicorn app:app_ --reload --host 0.0.0.0
+# RUN alembic -c /app/alembic.ini upgrade head
+CMD alembic -c /app/alembic.ini upgrade head && uvicorn app:app_ --reload --host 0.0.0.0
 # CMD uvicorn app:app_ --reload --host 0.0.0.0 && alembic -c app/alembic.ini upgrade head

@@ -6,7 +6,7 @@ spec:
   capacity:
     storage: 1Gi 
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   hostPath:
     path: /var/pvc/cs-api
 
@@ -18,7 +18,7 @@ metadata:
   name: api-pvc
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi

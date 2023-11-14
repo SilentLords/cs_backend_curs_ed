@@ -18,5 +18,4 @@ RUN  #pip install "git+git://github.com/samuelcolvin/pydantic@master#egg=pydanti
 COPY . .
 EXPOSE 8000
 # CMD alembic -c /app/alembic.ini upgrade head
-RUN bash -c "alembic -c /app/alembic.ini upgrade head
-CMD uvicorn ...app:app_ --reload --host 0.0.0.0
+CMD uvicorn ...app:app_ --reload --host 0.0.0.0 && bash -c "alembic -c .../app/alembic.ini upgrade head"

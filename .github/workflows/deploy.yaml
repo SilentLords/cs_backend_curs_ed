@@ -23,11 +23,11 @@ jobs:
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
         run: doctl registry login --expiry-seconds 1200
 
-      - name: Push image to DigitalOcean Container Registry
-        run: docker push registry.digitalocean.com/evomg-cr/cs-backend:$(echo $GITHUB_SHA | head -c7)
-
       - name: Update deployment file
         run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|IMAGE|registry.digitalocean.com/evomg-cr/cs-backend:'${TAG}'|' k8s/deployment.yaml
+
+      - name: Push image to DigitalOcean Container Registry
+        run: docker push registry.digitalocean.com/evomg-cr/cs-backend:$(echo $GITHUB_SHA | head -c7)
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 evomg-k8s
@@ -63,11 +63,11 @@ jobs:
       - name: Log in to DigitalOcean Container Registry with short-lived credentials
         run: doctl registry login --expiry-seconds 1200
 
-      - name: Push image to DigitalOcean Container Registry
-        run: docker push registry.digitalocean.com/evomg-cr/cs-backend-celery:$(echo $GITHUB_SHA | head -c7)
-
       - name: Update deployment file
         run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|IMAGE|registry.digitalocean.com/evomg-cr/cs-backend-celery:'${TAG}'|' k8s/deployment.yaml
+
+      - name: Push image to DigitalOcean Container Registry
+        run: docker push registry.digitalocean.com/evomg-cr/cs-backend-celery:$(echo $GITHUB_SHA | head -c7)
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 evomg-k8s

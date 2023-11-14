@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 8000
 # CMD alembic -c /app/alembic.ini upgrade head
 
-CMD uvicorn app:app_ --reload --host 0.0.0.0 --root-path /api && bash -c "alembic -c app/alembic.ini upgrade head"
+CMD uvicorn app:app_ --reload --host 0.0.0.0 && bash -c "alembic -c app/alembic.ini upgrade head"

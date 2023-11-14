@@ -1,34 +1,28 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  name: cs-backend-deployment
+  name: evom.games.ingress
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: cs-backend
-  template:
-    metadata:
-      labels:
-        app: cs-backend
-    spec:
-      imagePullSecrets:
-      - name: evomg-cr
-      containers:
-      - name: cs-backend
-        image: IMAGE
-        ports:
-        - containerPort: 8020
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8020
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        resources:
-          requests:
-            cpu: 50m
-            memory: 200Mi
-          limits:
-            cpu: 100m
-            memory: 500Mi
+  tls:
+  - hosts:
+    - cs2.game
+    secretName: cs2.game
+  rules:
+  - host: "cs2.game"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/api"
+        backend:
+          service:
+            name: cs-backend-service
+            port:
+              number: 80
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: csgo-frontend-service
+            port:
+              number: 80
+  ingressClassName: nginx

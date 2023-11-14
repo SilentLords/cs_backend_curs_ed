@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cs-backend-celery-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cs-backend-celery
+  template:
+    metadata:
+      labels:
+        app: cs-backend-celery
+    spec:
+      containers:
+        - name: cs-backend-celery
+          image: IMAGE 
+          ports:
+            - containerPort: 8020
+          volumeMounts:
+            - name: api-celery-volume
+              mountPath: /app
+      volumes:
+        - name: api-celery-volume
+          persistentVolumeClaim:
+            claimName: api-celery-pvc

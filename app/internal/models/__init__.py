@@ -1,5 +1,6 @@
-from .user import User, Billing
+from .user import User, Billing, Token
 __models__ = [
     User,
-    Billing
+    Billing,
+    Token
 ]

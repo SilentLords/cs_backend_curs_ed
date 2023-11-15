@@ -7,16 +7,32 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from config import DB_NAME, DB_USERNAME, DB_PORT, DB_PASSWORD
+from app.configuration.settings import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
 section = config.config_ini_section
-config.set_section_option(section, "DB_PORT", DB_PORT)
-config.set_section_option(section, "DB_USERNAME", DB_USERNAME)
-config.set_section_option(section, "DB_NAME", DB_NAME)
-config.set_section_option(section, "DB_PASSWORD", DB_PASSWORD)
+# print(f'{settings.db_port=}')
+# print(f'{settings.db_username=}')
+# print(f'{settings.db_name=}')
+# print(f'{settings.db_password=}')
+# config.set_section_option(section, "DB_PORT", DB_PORT)
+# config.set_section_option(section, "DB_USERNAME", DB_USERNAME)
+# config.set_section_option(section, "DB_NAME", DB_NAME)
+# config.set_section_option(section, "DB_PASSWORD", DB_PASSWORD)
+# config.set_section_option(section, "DB_PORT", settings.db_port)
+# config.set_section_option(section, "DB_USERNAME", settings.db_username)
+# config.set_section_option(section, "DB_NAME", settings.db_name)
+# config.set_section_option(section, "DB_PASSWORD", settings.db_password)
+
+config.set_section_option('alembic',
+                          'sqlalchemy.url',
+                          (f'postgresql+asyncpg://{settings.db_username}:{settings.db_password}@{settings.db_host}:'
+                           f'{settings.db_port}/{settings.db_name}?async_fallback=True')
+                          )
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:

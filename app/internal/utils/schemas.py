@@ -53,9 +53,14 @@ class UserBase(BaseModel):
     nickname: str | None = None
 
 
+class BillingAccountSchema(BaseModel):
+    balance: float | None = None
+
+
 class User(UserBase):
     id: int | None = None
     stats: Statistic | None = None
+    billing_account: BillingAccountSchema | None = None
 
     class Config:
         from_attributes = True

@@ -86,11 +86,8 @@ async def run_async_migrations() -> None:
     if settings.is_prod == "true":
         connectable = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, connect_args={"ssl": my_ssl_context})
     else:
-        connectable = async_engine_from_config(
-                config.get_section(config.config_ini_section, {}),
-                prefix="sqlalchemy.",
-                poolclass=pool.NullPool,
-            )
+        connectable = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
+
 
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)

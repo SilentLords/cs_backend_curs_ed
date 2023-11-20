@@ -16,6 +16,7 @@ from app.internal.utils.schemas import CommonHTTPException, TokenData, Statistic
 from app.internal.utils.oauth import register_oauth
 from app.internal.utils.services import get_or_create_user, create_access_token, get_current_active_user, \
     get_current_user, get_user, check_auth_user, collect_statistics
+from app.internal.utils.user import add_money_to_user, debit_user_money, freeze_user_money, unfreeze_user_money
 from app.pkg.postgresql import get_session
 from fastapi.security import OAuth2PasswordBearer
 from app.internal.utils.services import fetch_data_from_external_api
@@ -93,3 +94,27 @@ async def auth(request: Request, session: AsyncSession = Depends(get_session)):
 async def logout(request: Request):
     request.session.pop("user", None)
     return RedirectResponse(url="/")
+
+
+@router.post("/add_money/{user_id}")
+async def add_money(user_id: int, amount: float, transaction_type: str, db: AsyncSession = Depends(get_session)):
+    """Добавление денег пользователю"""
+    return await add_money_to_user(user_id, amount, transaction_type, db)
+
+
+@router.post("/debit_money/{user_id}")
+async def debit_money(user_id: int, amount: float, transaction_type: str, db: AsyncSession = Depends(get_session)):
+    """Списание средств с баланса пользователя"""
+    return await debit_user_money(user_id, amount, transaction_type, db)
+
+
+@router.post("/freeze_money/{transaction_id}")
+async def freeze_money(transaction_id: int, db: AsyncSession = Depends(get_session)):
+    """Заморозка средств пользователя"""
+    return await freeze_user_money(transaction_id, db)
+
+
+@router.post("/unfreeze_money/{transaction_id}")
+async def unfreeze_money(transaction_id: int, db: AsyncSession = Depends(get_session)):
+    """Разморозка средств пользователя"""
+    return await unfreeze_user_money(transaction_id, db)

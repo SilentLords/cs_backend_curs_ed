@@ -21,8 +21,8 @@ services:
 
   worker:
     build:
-      context: .
-      dockerfile: ./api/DockerfileCelery_dev
+      context: ../
+      dockerfile: ./docker/api/DockerfileCelery_dev
     command: celery -A app.internal.celery_app.celery worker --beat --loglevel=INFO
     container_name: "${COMPOSE_PROJECT_NAME}worker"
     volumes:

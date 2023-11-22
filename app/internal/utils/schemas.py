@@ -13,6 +13,7 @@ class Content(BaseModel):
     result: Optional[T] = None
 
 
+
 class CommonResponse(Response):
     media_type = 'application/json'
     content: Content

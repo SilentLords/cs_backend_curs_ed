@@ -42,6 +42,8 @@ async def get_hub_count(request: Request) -> schemas.UsersHub:
     r_data = schemas.UsersHub(count=data['players_joined'])
     return r_data
 
+
+
 @router.get("/login")
 async def login(request: Request, redirect_uri: str):
     redirect_callback_uri = settings.oauth_authorize_redirect_path

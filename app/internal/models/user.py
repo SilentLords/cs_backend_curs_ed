@@ -13,6 +13,11 @@ class User(Base):
     nickname: Column = Column(String, unique=True)
     ethereum_ID: Column = Column(String, unique=True)
     billing_model: Column = Column(Integer, ForeignKey("billing.id"))
+    password: Column = Column(String)
+
+    billing_account = relationship(
+        'BillingAccount', back_populates='user', uselist=False, cascade='all, delete-orphan', lazy='joined'
+    )
 
     billing_account = relationship(
         'BillingAccount', back_populates='user', uselist=False, cascade='all, delete-orphan', lazy='joined'

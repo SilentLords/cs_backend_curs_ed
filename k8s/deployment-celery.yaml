@@ -17,3 +17,6 @@ spec:
           image: IMAGE 
           ports:
             - containerPort: 8020
+          envFrom:
+            - secretRef:
+               name: cs-backend-secrets

@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     celery_broker_url: str = Field(..., env='CELERY_BROKER_URL')
     celery_result_backend: str = Field(..., env='CELERY_RESULT_BACKEND')
     compose_project_name: str = Field(..., env='COMPOSE_PROJECT_NAME')
+
     is_prod: str = Field(..., env='IS_PROD')
     oauth_client_id: str = Field(..., env='OAUTH_CLIENT_ID')
     oauth_client_secret: str = Field(..., env='OAUTH_CLIENT_SECRET')

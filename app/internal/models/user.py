@@ -19,6 +19,10 @@ class User(Base):
         'BillingAccount', back_populates='user', uselist=False, cascade='all, delete-orphan', lazy='joined'
     )
 
+    billing_account = relationship(
+        'BillingAccount', back_populates='user', uselist=False, cascade='all, delete-orphan', lazy='joined'
+    )
+
 
 class Billing(Base):
     __tablename__: str = "billing"

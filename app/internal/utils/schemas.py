@@ -13,10 +13,13 @@ class Content(BaseModel):
     result: Optional[T] = None
 
 
+
 class CommonResponse(Response):
     media_type = 'application/json'
     content: Content
 
+class UsersHub(BaseModel):
+    count : int
 
 class CommonHTTPException(HTTPException):
     detail: Content

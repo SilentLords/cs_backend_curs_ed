@@ -6,6 +6,6 @@ spec:
   selector:
     app: cs-backend
   ports:
-    - protocol: TCP
+    - name: http
       port: 80
-      targetPort: 8020
+      targetPort: 8000

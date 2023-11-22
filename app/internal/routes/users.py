@@ -19,11 +19,11 @@ from app.internal.utils.services import get_or_create_user, create_access_token,
 from app.internal.utils.user import add_money_to_user, debit_user_money, freeze_user_money, unfreeze_user_money
 from app.pkg.postgresql import get_session
 from fastapi.security import OAuth2PasswordBearer
-
+from app.internal.utils.services import fetch_data_from_external_api
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter(
-    prefix='/api/v1/users'
+    prefix='/backend/api/v1/users'
 )
 
 oauth = register_oauth()
@@ -35,6 +35,14 @@ async def home(request: Request):
     if not request.session.get("user"):
         return {"message": "Добро пожаловать! Войдите с помощью OAuth."}
     return {"message": f"Привет, {request.session['user']}!"}
+
+
+@router.get('/hub')
+async def get_hub_count(request: Request) -> schemas.UsersHub:
+    data = await fetch_data_from_external_api( path=f'hubs/8a9629cf-c837-4389-97a1-1c47cf886df4')
+    r_data = schemas.UsersHub(count=data['players_joined'])
+    return r_data
+
 
 
 @router.get("/login")

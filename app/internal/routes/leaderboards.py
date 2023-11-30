@@ -20,6 +20,8 @@ async def get_leaderboard(offset: int, limit: int = 20, get_latest: bool = False
         else:
             return {"message": "Auth Error"}
 
+
+    print(leaderboard_id)
     data = await fetch_data_from_external_api(q_param=q_param, path=f'leaderboards/{leaderboard_id}')
     if data:
         new_items = []
@@ -32,6 +34,8 @@ async def get_leaderboard(offset: int, limit: int = 20, get_latest: bool = False
         return data
     else:
         return {"message": "Auth Error"}
+
+
 
 
 @router.get("/get_lastest_leaderboard")

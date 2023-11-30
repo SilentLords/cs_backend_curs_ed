@@ -14,6 +14,10 @@ from jose import jwt, JWTError
 from app.internal.utils.schemas import CommonHTTPException, TokenData, Statistic, BaseStatistic
 from app.pkg.postgresql import get_session, settings
 
+
+
+
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 

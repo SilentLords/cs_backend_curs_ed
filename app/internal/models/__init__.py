@@ -1,4 +1,5 @@
-from .user import User, Billing, Token, BillingAccount, Transaction, TransactionBlock
+from .user import User, Billing, Token
+from .billing import BillingAccount, Transaction, TransactionBlock, WithdrawCheck, WithdrawRequest
 
 __models__ = [
     User,
@@ -6,5 +7,8 @@ __models__ = [
     Token,
     BillingAccount,
     Transaction,
-    TransactionBlock
+    TransactionBlock,
+    WithdrawCheck,
+    WithdrawRequest
+
 ]

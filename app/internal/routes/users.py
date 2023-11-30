@@ -21,7 +21,7 @@ from app.pkg.postgresql import get_session
 from fastapi.security import OAuth2PasswordBearer
 from app.internal.utils.services import fetch_data_from_external_api
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
+from app.internal.utils.enums import TRANSACTION_TYPE_CHOICES
 router = APIRouter(
     prefix='/backend/api/v1/users'
 )
@@ -107,7 +107,7 @@ async def add_money(user_id: int, amount: float, transaction_type: str, db: Asyn
 @router.post("/debit_money/{user_id}")
 async def debit_money(user_id: int, amount: float, transaction_type: str, db: AsyncSession = Depends(get_session)):
     """Списание средств с баланса пользователя"""
-    return await debit_user_money(user_id, amount, transaction_type, db)
+    return await debit_user_money(user_id, -amount, transaction_type, db)
 
 
 @router.post("/freeze_money/{transaction_id}")

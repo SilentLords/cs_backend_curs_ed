@@ -42,6 +42,6 @@ celery_app.conf.beat_schedule = {
     },
     'gifts-distribution': {
         'task': 'app.internal.celery_app.tasks.distribute_gifts',
-        'schedule': timedelta(seconds=30)
+        'schedule': timedelta(hours=12)
     },
 }

@@ -314,7 +314,7 @@ async def create_session(a_session):
         return session
 
 
-async def prize_distribution(gift_event: GiftEvent, session: AsyncSession):
+async def prize_distribution(gift_event: GiftEvent):
     """Функция начисляет призовые деньги"""
     offset = 0
     limit = 4
@@ -335,24 +335,24 @@ async def prize_distribution(gift_event: GiftEvent, session: AsyncSession):
         nickname = gamer["player"]["nickname"]
         list_nic.append(nickname)
     print("PLAYERS: ", list_nic)
+    # проверяем есть ли пользователь с таким ником в нашей БД
+    # try:
+    ca_path = "app/certs/ca-certificate.crt"
+    my_ssl_context = ssl.create_default_context(cafile=ca_path)
+    my_ssl_context.verify_mode = ssl.CERT_REQUIRED
+    ssl_args = {'ssl': {'ca': ca_path}}
+    SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{settings.db_username}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
+    if settings.is_prod == "true":
+        engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, connect_args={"ssl": my_ssl_context})
+    else:
+        engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    async_session = sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
+    session = await create_session(async_session)
 
     for index, amount in enumerate(awards):
-        # проверяем есть ли пользователь с таким ником в нашей БД
-        # try:
-        ca_path = "app/certs/ca-certificate.crt"
-        my_ssl_context = ssl.create_default_context(cafile=ca_path)
-        my_ssl_context.verify_mode = ssl.CERT_REQUIRED
-        ssl_args = {'ssl': {'ca': ca_path}}
-        SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{settings.db_username}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
-        if settings.is_prod == "true":
-            engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, connect_args={"ssl": my_ssl_context})
-        else:
-            engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
-        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-        async_session = sessionmaker(
-            engine, class_=AsyncSession, expire_on_commit=False
-        )
-        session = await create_session(async_session)
         user = None
         result = await session.execute(select(User).where(User.nickname == list_nic[index]))
         if res := result.unique().scalars().all():
@@ -371,5 +371,8 @@ async def prize_distribution(gift_event: GiftEvent, session: AsyncSession):
             raise HTTPException(status_code=500, detail="Ошибка начисления средств")
         list_of_awarded_users.append(awarded_user)
     gift_event.status = GIFT_EVENT_STATUS_CHOICES_ENUM.DONE
+    from sqlalchemy import update
+    await session.execute(update(GiftEvent).filter(GiftEvent.id==gift_event.id).values(status= GIFT_EVENT_STATUS_CHOICES_ENUM.DONE))
+    print('----------------------------SAVE-------------GIFT---------EVENT-----------------------------------')
     await session.commit()
     return JSONResponse(content={'detail': f'Пользователи {list_nic} получили призовые'})

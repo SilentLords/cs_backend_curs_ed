@@ -1,3 +1,4 @@
+
 from fastapi import HTTPException
 from pydantic import BaseModel, Field
 from typing import TypeVar, Optional, List, Union, Dict, Any
@@ -11,6 +12,7 @@ T = TypeVar('T')
 class Content(BaseModel):
     message: str = Field(..., description='Response message')
     result: Optional[T] = None
+
 
 
 class CommonResponse(Response):
@@ -55,9 +57,14 @@ class UserBase(BaseModel):
     nickname: str | None = None
 
 
+class BillingAccountSchema(BaseModel):
+    balance: float | None = None
+
+
 class User(UserBase):
     id: int | None = None
     stats: Statistic | None = None
+    billing_account: BillingAccountSchema | None = None
 
     class Config:
         from_attributes = True

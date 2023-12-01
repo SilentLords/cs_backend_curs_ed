@@ -2,42 +2,9 @@ import asyncio
 
 import typer
 
-from app.pkg.postgresql import init_models
+from app.internal.models.user import create_super_user
 
-import typer
-
-app = typer.Typer()
-
-
-#
-# @app.command()
-# def hello(name: str):
-#     print(f"Hello {name}")
-#
-#
-@app.command()
-def goodbye(name: str, formal: bool = False):
-    asyncio.run(init_models())
-    print("Done")
-
-
-@app.command()
-def db_init_models(name: str):
-    asyncio.run(init_models())
-    print("Done")
-
-
-if __name__ == "__main__":
-    app()
-
-# cli = typer.Typer()
-#
-#
-# @cli.command()
-# def db_init_models():
-#     asyncio.run(init_models())
-#     print("Done")
-#
-#
-# if __name__ == "__main__":
-#     cli()
+name = input('Enter you name: ')
+password = input('Enter you password: ')
+asyncio.run(create_super_user(name, password))
+print("Done")

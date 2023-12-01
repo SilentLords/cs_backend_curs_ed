@@ -62,7 +62,7 @@ def distribute_gifts():
     if gift:
         if gift.status == GIFT_EVENT_STATUS_CHOICES_ENUM.IN_PROGRESS:
             print("Start send Gifts")
-            result = prize_distribution(gift, session)
+            result = prize_distribution(gift)
             asyncio.run(result)
 
 

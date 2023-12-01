@@ -1,3 +1,5 @@
+import asyncio
+
 from celery import shared_task
 from app.internal.models import WithdrawCheck, User
 from app.internal.utils.bscscan import get_transactions
@@ -8,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.util import greenlet_spawn
 
 from app.internal.models import User, BillingAccount, Transaction, TransactionBlock
+from app.internal.utils.services import prize_distribution
 from app.pkg.postgresql import get_session
 
 
@@ -15,6 +18,15 @@ from app.pkg.postgresql import get_session
 def hello_world():
     print("Hello, world!")
 
+
+@shared_task()
+def distribute_gifts():
+    # Todo: список ниже
+    # 1. Получить GiftEvent сегодняшней даты
+    # 2. если ивент есть и статус в прогрессе то выполняем
+    # 3. Ставим GiftEvent`у статус Done
+    result = prize_distribution()
+    asyncio.run(result)
 
 
 

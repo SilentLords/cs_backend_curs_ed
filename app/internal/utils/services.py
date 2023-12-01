@@ -1,11 +1,14 @@
 from datetime import datetime, timedelta
 from typing import Annotated
+
+from starlette.responses import JSONResponse
+
 from app.internal.utils.blockchain_utils import convert_blockchain_value_to_decimal
 
 import httpx
 from fastapi import Depends, HTTPException
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_session
 from starlette import status
 from app.internal.models import *
 from fastapi.security import OAuth2PasswordBearer
@@ -13,6 +16,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from app.internal.utils.bscscan import get_transactions
 from app.internal.utils.schemas import CommonHTTPException, TokenData, Statistic, BaseStatistic
+from app.internal.utils.user import add_money_to_user
 from app.pkg.postgresql import get_session, settings
 from app.internal.utils.enums import WITHDRAW_REQUEST_STATUS_CHOICES_ENUM
 
@@ -280,3 +284,69 @@ async def update_withdraw_request_statuses():
                 print(f"Unknown user: {e['hash']}")
         else:
             print(f"Transaction already checked: {e['hash']}")
+
+
+async def getting_list_best_players(offset: int, limit: int, get_latest: bool):
+    leaderboard_id: str = settings.leaderboard_id
+    q_param = {'offset': offset, "limit": limit}
+    if get_latest:
+        leaderboards_data = await fetch_data_from_external_api(q_param=q_param,
+                                                               path=f'leaderboards/hubs/8a9629cf-c837-4389-97a1-1c47cf886df4')
+        if leaderboards_data:
+            leaderboard_id = max(leaderboards_data['items'], key=lambda x: x['start_date'])['leaderboard_id']
+        else:
+            return {"message": "Auth Error"}
+
+    data = await fetch_data_from_external_api(q_param=q_param, path=f'leaderboards/{leaderboard_id}')
+    if data:
+        new_items = []
+        for item in data['items']:
+            item_n = item.copy()
+            item['player']['statistic'] = await collect_base_statistics(nickname=item_n['player']["nickname"],
+                                                                        user_id=item_n['player']["user_id"])
+            new_items.append(item)
+        data['items'] = new_items
+        return data
+    else:
+        return {"message": "Auth Error"}
+
+
+async def prize_distribution():
+    """Функция начисляет призовые деньги"""
+    offset = 0
+    limit = 4
+    get_latest = True
+    awards = [100, 70, 50, 30]
+    # получаем словарь турнирной таблицы
+    try:
+        leaderboard = await getting_list_best_players(offset, limit, get_latest)
+    except Exception as ex:
+        raise HTTPException(status_code=500, detail="Ошибка получения лидерборда")
+    top_players = leaderboard["items"]
+    list_nic = []
+    list_of_awarded_users = []
+
+    # достаём никнеймы лидеров турнирной таблицы
+    for gamer in top_players:
+        nickname = gamer["player"]["nickname"]
+        list_nic.append(nickname)
+
+    for index, amount in enumerate(awards):
+        # проверяем есть ли пользователь с таким ником в нашей БД
+        async with async_session() as session:
+            # try:
+            user = await get_user(list_nic[index], session)
+            # except Exception as ex:
+            #     raise HTTPException(status_code=500, detail="Ошибка получения пользователя")
+            print(list_nic[index])
+            if not user:
+                continue
+            user_id = user.id
+            transaction_type = "prize_money"
+            amount = float(amount)
+            try:
+                awarded_user = await add_money_to_user(user_id, amount, transaction_type, session)
+            except Exception as ex:
+                raise HTTPException(status_code=500, detail="Ошибка начисления средств")
+            list_of_awarded_users.append(awarded_user)
+    return JSONResponse(content={'detail': f'Пользователи {list_nic} получили призовые'})

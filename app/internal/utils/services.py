@@ -306,7 +306,7 @@ async def getting_list_best_players(offset: int, limit: int, get_latest: bool, l
 
     data = await fetch_data_from_external_api(q_param=q_param, path=f'leaderboards/{leaderboard_id}')
     if data:
-        return data['items'][:4]
+        return data['items'][:limit]
     else:
         return {"message": "Auth Error"}
 async def create_session(a_session):

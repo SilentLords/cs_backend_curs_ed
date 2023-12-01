@@ -5,7 +5,8 @@ from web3.middleware import geth_poa_middleware
 
 from app.configuration.settings import settings
 from app.internal.utils import bscscan
-from utils.blockchain_utils import convert_blockchain_value_to_decimal
+
+from app.internal.utils.blockchain_utils import convert_blockchain_value_to_decimal
 
 
 def call_contract_function(abi, contract_address, function_name, args):

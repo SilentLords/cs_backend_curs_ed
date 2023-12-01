@@ -40,7 +40,6 @@ async def get_lastest_leaderboard(offset: int, limit: int = 20):
     else:
         return {"message": "Auth Error"}
 
-
 @router.get('/test_new_func')
 async def test_new_func():
     return await prize_distribution()

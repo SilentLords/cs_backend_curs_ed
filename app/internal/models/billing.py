@@ -1,8 +1,10 @@
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Float, MetaData, Table, DateTime, func
 from sqlalchemy.orm import relationship
-from app.internal.utils.enums import TRANSACTION_TYPE_CHOICES, WITHDRAW_REQUEST_STATUS_CHOICES
+from app.internal.utils.enums import TRANSACTION_TYPE_CHOICES_ENUM, WITHDRAW_REQUEST_STATUS_CHOICES_ENUM
 from .user import User
 from .base import Base, ChoiceType
+from sqlalchemy.dialects.postgresql import ENUM as PgEnum
+
 
 class BillingAccount(Base):
     __tablename__ = 'billing_account'
@@ -30,7 +32,7 @@ class Transaction(Base):
     account_id = Column(Integer, ForeignKey('billing_account.id'))
     amount = Column(Float, default=0, nullable=False)
     balance_after_transaction = Column(Float, default=0, nullable=False)
-    type = Column(ChoiceType(TRANSACTION_TYPE_CHOICES))
+    type = Column(PgEnum(TRANSACTION_TYPE_CHOICES_ENUM, name='transaction_type', create_type=False), nullable=False, default=TRANSACTION_TYPE_CHOICES_ENUM.EMPTY)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
     account = relationship('BillingAccount', back_populates='transactions')
@@ -50,6 +52,7 @@ class TransactionBlock(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     transaction_id = Column(Integer, ForeignKey('transaction.id', ondelete='CASCADE'))
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    withdraw_request = relationship('WithdrawRequest', back_populates='transaction_block')
 
     transaction = relationship('Transaction', back_populates='transaction_block')
 
@@ -67,7 +70,7 @@ class WithdrawRequest(Base):
 
     amount = Column(Float, default=0, nullable=False )
     tx_hash = Column(String(length=255), nullable=True)
-    status = Column(ChoiceType(WITHDRAW_REQUEST_STATUS_CHOICES))
+    status = Column(PgEnum(WITHDRAW_REQUEST_STATUS_CHOICES_ENUM, name='withdraw_request_type', create_type=False), nullable=False, default=WITHDRAW_REQUEST_STATUS_CHOICES_ENUM.EMPTY)
     transaction_block = relationship('TransactionBlock', back_populates='withdraw_request')
     transaction_block_id = Column(Integer, ForeignKey('transaction_block.id'))
 

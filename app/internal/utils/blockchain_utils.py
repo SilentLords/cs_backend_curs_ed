@@ -12,5 +12,4 @@ def convert_decimal_to_evo_int(value: decimal.Decimal) -> int:
 
 
 def convert_decimal_to_evo_int_for_contract(value: decimal.Decimal) -> int:
-    decimal_str = f"{str(value).replace('.', '')}"
-    return int(decimal_str)
+    return int(f"{round((decimal.Decimal(value) * decimal.Decimal(1000000000000000000)), 0)}")

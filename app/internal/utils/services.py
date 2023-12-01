@@ -1,9 +1,17 @@
 from datetime import datetime, timedelta
 from typing import Annotated
 
-from starlette.responses import JSONResponse
+from fastapi.responses import JSONResponse
+import datetime
 
-from app.internal.utils.blockchain_utils import convert_blockchain_value_to_decimal
+from app.internal.models.gifts import GiftEvent
+from app.configuration import settings
+
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import sessionmaker
+import ssl
+
+
 
 import httpx
 from fastapi import Depends, HTTPException
@@ -18,10 +26,8 @@ from app.internal.utils.bscscan import get_transactions
 from app.internal.utils.schemas import CommonHTTPException, TokenData, Statistic, BaseStatistic
 from app.internal.utils.user import add_money_to_user
 from app.pkg.postgresql import get_session, settings
-from app.internal.utils.enums import WITHDRAW_REQUEST_STATUS_CHOICES_ENUM
-
-
-
+from app.internal.utils.enums import WITHDRAW_REQUEST_STATUS_CHOICES_ENUM, TRANSACTION_TYPE_CHOICES_ENUM, \
+    GIFT_EVENT_STATUS_CHOICES_ENUM
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -36,11 +42,14 @@ async def get_or_create_user(session: AsyncSession, nickname: str, openid: str):
     await session.refresh(new_user)
     return new_user
 
+
 async def get_or_create_billing_account(session: AsyncSession, user_id: int):
     result = await session.execute(select(BillingAccount).where(BillingAccount.user_id == user_id))
-    if res := result.scalars().all():
+
+    if res := result.unique().scalars().all():
+        print(res)
         return res[0]
-    
+
     result = await session.execute(select(User).where(User.id == user_id))
     user = result.scalars().all()[0]
     new_billing_account = BillingAccount(user_id=user_id, user=user)
@@ -49,20 +58,20 @@ async def get_or_create_billing_account(session: AsyncSession, user_id: int):
     await session.refresh(new_billing_account)
     return new_billing_account
 
+
 async def get_user(nickname: str, session: AsyncSession):
-    user = await session.execute(select(User).where(User.nickname == nickname))
-    if user := user.unique().scalars().all():
-        user = user[0]
-        return user
+    result = await session.execute(select(User).where(User.nickname == nickname))
+    if res := result.unique().scalars().all():
+        return res[0]
     return None
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
     return encoded_jwt
@@ -235,59 +244,57 @@ async def collect_statistics(nickname: str, user_id: str) -> Statistic:
     return stats
 
 
+# async def update_withdraw_request_statuses():
+#     db = await get_session()
+#     async def get_lastblock():
+#
+#         query = select(WithdrawCheck).order_by(WithdrawCheck.tx_blockNumber.desc())[0]
+#         result_query =await db.execute(query)
+#         last_blocknumber = result_query.scalar()
+#         if last_blocknumber:
+#             return last_blocknumber.tx_blockNumber
+#         return 0
+#
+#     startblock = await get_lastblock()
+#
+#     token_txs = get_transactions(settings.corporate_payouts_contract_address, startblock)
+#
+#     for e in token_txs:
+#         query = select(WithdrawCheck).filter(WithdrawCheck.tx_hash==e['hash'])
+#         result_query =await db.execute(query).scalar()
+#         if not result_query:
+#             withdraw_check = WithdrawCheck(tx_hash=e['hash'],
+#                                       tx_from=e['from'],
+#                                       tx_to=e['to'],
+#                                       tx_blockNumber=e['blockNumber'])
+#             db.add(withdraw_check)
+#             await db.commit()
+#             await db.refresh(withdraw_check)
+#             query = select(User).filter(User.ethereum_ID == e['to'])[0]
+#             result_query =await db.execute(query).scalar()
+#             if user:=  result_query:
+#
+#                 billing_account = get_or_create_billing_account(db, user_id=user.id)
+#                 amount = convert_blockchain_value_to_decimal(e['value'])
+#                 query = select(WithdrawRequest).filter(WithdrawRequest.account ==billing_account,WithdrawRequest.status==WITHDRAW_REQUEST_STATUS_CHOICES_ENUM.IN_PROGRESS,WithdrawRequest.amount==amount )
+#                 result_query =await db.execute(query).scalar()
+#                 if withdraw_request := result_query:
+#                     withdraw_request = withdraw_request[0]
+#                     convert_freeze_to_transaction(withdraw_request.transaction_block)
+#                     withdraw_request.status = WITHDRAW_REQUEST_STATUS_CHOICES_ENUM.DONE
+#                     withdraw_request.transaction_block = None
+#                     withdraw_request.tx_hash = e['hash']
+#                     withdraw_request.save()
+#                     print(f"Withdraw request done: {e['hash']}")
+#                 else:
+#                     print(f"Withdraw request not found: {e['hash']}")
+#             else:
+#                 print(f"Unknown user: {e['hash']}")
+#         else:
+#             print(f"Transaction already checked: {e['hash']}")
 
-async def update_withdraw_request_statuses():
-    db = await get_session()
-    async def get_lastblock():
 
-        query = select(WithdrawCheck).order_by(WithdrawCheck.tx_blockNumber.desc())[0]
-        result_query =await db.execute(query)
-        last_blocknumber = result_query.scalar()
-        if last_blocknumber:
-            return last_blocknumber.tx_blockNumber
-        return 0
-
-    startblock = await get_lastblock()
-
-    token_txs = get_transactions(settings.corporate_payouts_contract_address, startblock)
-
-    for e in token_txs:
-        query = select(WithdrawCheck).filter(WithdrawCheck.tx_hash==e['hash'])
-        result_query =await db.execute(query).scalar()
-        if not result_query:
-            withdraw_check = WithdrawCheck(tx_hash=e['hash'],
-                                      tx_from=e['from'],
-                                      tx_to=e['to'],
-                                      tx_blockNumber=e['blockNumber'])
-            db.add(withdraw_check)
-            await db.commit()
-            await db.refresh(withdraw_check)
-            query = select(User).filter(User.ethereum_ID == e['to'])[0]
-            result_query =await db.execute(query).scalar()
-            if user:=  result_query:
-
-                billing_account = get_or_create_billing_account(db, user_id=user.id)
-                amount = convert_blockchain_value_to_decimal(e['value'])
-                query = select(WithdrawRequest).filter(WithdrawRequest.account ==billing_account,WithdrawRequest.status==WITHDRAW_REQUEST_STATUS_CHOICES_ENUM.IN_PROGRESS,WithdrawRequest.amount==amount )
-                result_query =await db.execute(query).scalar()
-                if withdraw_request := result_query:
-                    withdraw_request = withdraw_request[0]
-                    convert_freeze_to_transaction(withdraw_request.transaction_block)
-                    withdraw_request.status = WITHDRAW_REQUEST_STATUS_CHOICES_ENUM.DONE
-                    withdraw_request.transaction_block = None
-                    withdraw_request.tx_hash = e['hash']
-                    withdraw_request.save()
-                    print(f"Withdraw request done: {e['hash']}")
-                else:
-                    print(f"Withdraw request not found: {e['hash']}")
-            else:
-                print(f"Unknown user: {e['hash']}")
-        else:
-            print(f"Transaction already checked: {e['hash']}")
-
-
-async def getting_list_best_players(offset: int, limit: int, get_latest: bool):
-    leaderboard_id: str = settings.leaderboard_id
+async def getting_list_best_players(offset: int, limit: int, get_latest: bool, leaderboard_id: str):
     q_param = {'offset': offset, "limit": limit}
     if get_latest:
         leaderboards_data = await fetch_data_from_external_api(q_param=q_param,
@@ -299,30 +306,27 @@ async def getting_list_best_players(offset: int, limit: int, get_latest: bool):
 
     data = await fetch_data_from_external_api(q_param=q_param, path=f'leaderboards/{leaderboard_id}')
     if data:
-        new_items = []
-        for item in data['items']:
-            item_n = item.copy()
-            item['player']['statistic'] = await collect_base_statistics(nickname=item_n['player']["nickname"],
-                                                                        user_id=item_n['player']["user_id"])
-            new_items.append(item)
-        data['items'] = new_items
-        return data
+        return data['items'][:4]
     else:
         return {"message": "Auth Error"}
+async def create_session(a_session):
+    async with a_session() as session:
+        return session
 
 
-async def prize_distribution():
+async def prize_distribution(gift_event: GiftEvent, session: AsyncSession):
     """Функция начисляет призовые деньги"""
     offset = 0
     limit = 4
-    get_latest = True
-    awards = [100, 70, 50, 30]
+    get_latest = False
+    awards = [gift_event.top_one_count, gift_event.top_two_count, gift_event.top_three_count, gift_event.top_four_count]
     # получаем словарь турнирной таблицы
     try:
-        leaderboard = await getting_list_best_players(offset, limit, get_latest)
+        top_players = await getting_list_best_players(offset, limit, get_latest,
+                                                      leaderboard_id=gift_event.leaderboard_id)
     except Exception as ex:
         raise HTTPException(status_code=500, detail="Ошибка получения лидерборда")
-    top_players = leaderboard["items"]
+
     list_nic = []
     list_of_awarded_users = []
 
@@ -330,23 +334,42 @@ async def prize_distribution():
     for gamer in top_players:
         nickname = gamer["player"]["nickname"]
         list_nic.append(nickname)
+    print("PLAYERS: ", list_nic)
 
     for index, amount in enumerate(awards):
         # проверяем есть ли пользователь с таким ником в нашей БД
-        async with async_session() as session:
-            # try:
-            user = await get_user(list_nic[index], session)
-            # except Exception as ex:
-            #     raise HTTPException(status_code=500, detail="Ошибка получения пользователя")
-            print(list_nic[index])
-            if not user:
-                continue
-            user_id = user.id
-            transaction_type = "prize_money"
-            amount = float(amount)
-            try:
-                awarded_user = await add_money_to_user(user_id, amount, transaction_type, session)
-            except Exception as ex:
-                raise HTTPException(status_code=500, detail="Ошибка начисления средств")
-            list_of_awarded_users.append(awarded_user)
+        # try:
+        ca_path = "app/certs/ca-certificate.crt"
+        my_ssl_context = ssl.create_default_context(cafile=ca_path)
+        my_ssl_context.verify_mode = ssl.CERT_REQUIRED
+        ssl_args = {'ssl': {'ca': ca_path}}
+        SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{settings.db_username}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
+        if settings.is_prod == "true":
+            engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, connect_args={"ssl": my_ssl_context})
+        else:
+            engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        async_session = sessionmaker(
+            engine, class_=AsyncSession, expire_on_commit=False
+        )
+        session = await create_session(async_session)
+        user = None
+        result = await session.execute(select(User).where(User.nickname == list_nic[index]))
+        if res := result.unique().scalars().all():
+            user = res[0]
+        # except Exception as ex:
+        #     raise HTTPException(status_code=500, detail="Ошибка получения пользователя")
+        print(list_nic[index])
+        if not user:
+            continue
+        user_id = user.id
+        transaction_type = TRANSACTION_TYPE_CHOICES_ENUM.GIFT
+        amount = float(amount)
+        try:
+            awarded_user = await add_money_to_user(user_id, amount, transaction_type, session)
+        except Exception as ex:
+            raise HTTPException(status_code=500, detail="Ошибка начисления средств")
+        list_of_awarded_users.append(awarded_user)
+    gift_event.status = GIFT_EVENT_STATUS_CHOICES_ENUM.DONE
+    await session.commit()
     return JSONResponse(content={'detail': f'Пользователи {list_nic} получили призовые'})

@@ -8,7 +8,9 @@ from app.internal.models import User, BillingAccount, Transaction, TransactionBl
 from app.pkg.postgresql import get_session
 from app.internal.utils.exceptions import NotEnoughMoneyException
 
-async def add_money_to_user(user_id: int, amount: float, transaction_type: TRANSACTION_TYPE_CHOICES_ENUM, db: AsyncSession = Depends(get_session)):
+
+async def add_money_to_user(user_id: int, amount: float, transaction_type: TRANSACTION_TYPE_CHOICES_ENUM,
+                            db: AsyncSession = Depends(get_session)):
     """Добавление средств на баланс пользователя"""
     query = select(User).filter(User.id == user_id)
     result_query = await db.execute(query)
@@ -26,10 +28,8 @@ async def add_money_to_user(user_id: int, amount: float, transaction_type: TRANS
     balance_after_transaction = billing_account.balance
     balance_after_transaction += amount
 
-
-
     new_transaction = Transaction(account=billing_account, amount=amount,
-                                   balance_after_transaction=balance_after_transaction, type=transaction_type)
+                                  balance_after_transaction=balance_after_transaction, type=transaction_type)
     db.add(new_transaction)
     await db.commit()
     await db.refresh(new_transaction)
@@ -40,7 +40,8 @@ async def add_money_to_user(user_id: int, amount: float, transaction_type: TRANS
     return user
 
 
-async def debit_user_money(user_id: int, amount: float, transaction_type: TRANSACTION_TYPE_CHOICES_ENUM, db: AsyncSession = Depends(get_session)):
+async def debit_user_money(user_id: int, amount: float, transaction_type: TRANSACTION_TYPE_CHOICES_ENUM,
+                           db: AsyncSession = Depends(get_session)):
     """Списание средств с баланса пользователя"""
     query = select(User).filter(User.id == user_id)
     result_query = await db.execute(query)
@@ -62,7 +63,7 @@ async def debit_user_money(user_id: int, amount: float, transaction_type: TRANSA
         raise HTTPException(status_code=400, detail="Not enough money")
 
     new_transaction = Transaction(account=billing_account, amount=amount,
-                                   balance_after_transaction=balance_after_transaction, type=transaction_type)
+                                  balance_after_transaction=balance_after_transaction, type=transaction_type)
     db.add(new_transaction)
     await db.commit()
     await db.refresh(new_transaction)
@@ -72,8 +73,7 @@ async def debit_user_money(user_id: int, amount: float, transaction_type: TRANSA
 
     return new_transaction
 
-
-async def freeze_user_money(transaction_id: int, db: AsyncSession = Depends(get_session)):
+    # async def freeze_user_money(transaction_id: int, db: AsyncSession = Depends(get_session)):
     """Выполняет заморозку средств на балансе пользователя"""
     query = select(Transaction).where(Transaction.id == transaction_id)
     result_query = await db.execute(query)
@@ -110,9 +110,10 @@ async def unfreeze_user_money(transaction_id: int, db: AsyncSession = Depends(ge
     return {'transaction': transaction, 'transaction_block': transaction_block}
 
 
-async def freeze_user_money(user_id: int, amount: float, db: AsyncSession = Depends(get_session)) -> TransactionBlock | None:
+async def freeze_user_money(user_id: int, amount: float,
+                            db: AsyncSession = Depends(get_session)) -> TransactionBlock | None:
     try:
-        freeze_transaction = debit_user_money(user_id, amount, TRANSACTION_TYPE_CHOICES.FROZEN,db )
+        freeze_transaction = await debit_user_money(user_id, amount, TRANSACTION_TYPE_CHOICES_ENUM.FROZEN, db)
         transaction_block = TransactionBlock(transaction_id=freeze_transaction.id)
         db.add(transaction_block)
         await db.commit()
@@ -121,8 +122,7 @@ async def freeze_user_money(user_id: int, amount: float, db: AsyncSession = Depe
     except NotEnoughMoneyException as e:
         return None
 
-
-# async def unfreeze_user_money(transaction_block: TransactionBlock) -> Transaction:
+    # async def unfreeze_user_money(transaction_block: TransactionBlock) -> Transaction:
     copied_transaction_block = deepcopy(transaction_block)
     amount = copied_transaction_block.transaction.amount
 

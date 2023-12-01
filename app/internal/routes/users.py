@@ -20,8 +20,10 @@ from app.internal.utils.user import add_money_to_user, debit_user_money, freeze_
 from app.pkg.postgresql import get_session
 from fastapi.security import OAuth2PasswordBearer
 from app.internal.utils.services import fetch_data_from_external_api
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 from app.internal.utils.enums import TRANSACTION_TYPE_CHOICES
+
 router = APIRouter(
     prefix='/backend/api/v1/users'
 )
@@ -39,10 +41,9 @@ async def home(request: Request):
 
 @router.get('/hub')
 async def get_hub_count(request: Request) -> schemas.UsersHub:
-    data = await fetch_data_from_external_api( path=f'hubs/8a9629cf-c837-4389-97a1-1c47cf886df4')
+    data = await fetch_data_from_external_api(path=f'hubs/8a9629cf-c837-4389-97a1-1c47cf886df4')
     r_data = schemas.UsersHub(count=data['players_joined'])
     return r_data
-
 
 
 @router.get("/login")
@@ -61,6 +62,14 @@ async def get_me(session: AsyncSession = Depends(get_session), token: str = Depe
     # print(user)
     return user
 
+
+@router.put("/me/change_ethereum_id")
+async def change_ethereum_id(ethereum_ID: str, session: AsyncSession = Depends(get_session),
+                             token: str = Depends(oauth2_scheme), ):
+    user = await check_auth_user(token=token, session=session)
+    user.ethereum_ID =ethereum_ID
+    await session.commit()
+    return {}
 
 @router.get('/statistic')
 async def get_statistic(session: AsyncSession = Depends(get_session),
@@ -90,6 +99,7 @@ async def auth(request: Request, session: AsyncSession = Depends(get_session)):
         return RedirectResponse(url=f"{redirect_uri}?token={access_token}")
     except OAuthError as e:
         return JSONResponse({"error": "OAuth error", "message": str(e)})
+
 
 @router.delete("/logout")
 async def logout(request: Request):

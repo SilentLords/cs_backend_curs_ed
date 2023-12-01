@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.internal.utils.schemas import CommonResponse, Content
 from app.internal.utils.services import fetch_data_from_external_api, settings, collect_statistics, \
-    collect_base_statistics, getting_list_best_players, prize_distribution
+    collect_base_statistics
 from app.pkg.postgresql import get_session
 
 router = APIRouter(
@@ -13,10 +13,10 @@ router = APIRouter(
 )
 
 
-@router.get('/')
-async def get_leaderboard(offset: int, limit: int = 20, get_latest: bool = False):
-    """Роут получения лидерборда"""
-    return await getting_list_best_players(offset, limit, get_latest)
+# @router.get('/')
+# async def get_leaderboard(offset: int, limit: int = 20, get_latest: bool = False):
+#     """Роут получения лидерборда"""
+#     return await getting_list_best_players(offset, limit, get_latest)
 
 
 

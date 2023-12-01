@@ -91,32 +91,7 @@ async def auth(request: Request, session: AsyncSession = Depends(get_session)):
     except OAuthError as e:
         return JSONResponse({"error": "OAuth error", "message": str(e)})
 
-
 @router.delete("/logout")
 async def logout(request: Request):
     request.session.pop("user", None)
     return RedirectResponse(url="/")
-
-
-@router.post("/add_money/{user_id}")
-async def add_money(user_id: int, amount: float, transaction_type: str, db: AsyncSession = Depends(get_session)):
-    """Добавление денег пользователю"""
-    return await add_money_to_user(user_id, amount, transaction_type, db)
-
-
-@router.post("/debit_money/{user_id}")
-async def debit_money(user_id: int, amount: float, transaction_type: str, db: AsyncSession = Depends(get_session)):
-    """Списание средств с баланса пользователя"""
-    return await debit_user_money(user_id, -amount, transaction_type, db)
-
-
-@router.post("/freeze_money/{transaction_id}")
-async def freeze_money(transaction_id: int, db: AsyncSession = Depends(get_session)):
-    """Заморозка средств пользователя"""
-    return await freeze_user_money(transaction_id, db)
-
-
-@router.post("/unfreeze_money/{transaction_id}")
-async def unfreeze_money(transaction_id: int, db: AsyncSession = Depends(get_session)):
-    """Разморозка средств пользователя"""
-    return await unfreeze_user_money(transaction_id, db)

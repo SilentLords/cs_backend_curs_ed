@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Float, MetaData, Table, DateTime, func, 
+from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Float, MetaData, Table, DateTime, func
 from sqlalchemy.orm import relationship
 from app.internal.utils.enums import TRANSACTION_TYPE_CHOICES, WITHDRAW_REQUEST_STATUS_CHOICES
 from .user import User
@@ -11,6 +11,7 @@ class BillingAccount(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     balance = Column(Float, default=0, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    withdraw_request = relationship('WithdrawRequest', back_populates='account')
 
     user = relationship('User', back_populates='billing_account')
     transactions = relationship(
@@ -58,12 +59,15 @@ class TransactionBlock(Base):
 
 
 class WithdrawRequest(Base):
+    __tablename__ = 'withdraw_request'
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+
     account = relationship('BillingAccount', back_populates='withdraw_request')
     account_id = Column(Integer, ForeignKey('billing_account.id'))
 
     amount = Column(Float, default=0, nullable=False )
-    tx_hash = Column(String(length=255), null=True)
-    status = relationship(ChoiceType(WITHDRAW_REQUEST_STATUS_CHOICES))
+    tx_hash = Column(String(length=255), nullable=True)
+    status = Column(ChoiceType(WITHDRAW_REQUEST_STATUS_CHOICES))
     transaction_block = relationship('TransactionBlock', back_populates='withdraw_request')
     transaction_block_id = Column(Integer, ForeignKey('transaction_block.id'))
 
@@ -74,11 +78,14 @@ class WithdrawRequest(Base):
 
 
 class WithdrawCheck(Base):
-    tx_hash = Column(String(length=255), null=False)
-    tx_blockNumber = Column(String(length=255), null=False)
-    tx_from = Column(String(length=255), null=False)
-    tx_to = Column(String(length=255), null=False)
-    created_at = Column(String(length=255), null=False)
+    __tablename__ = 'withdraw_check'
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+
+    tx_hash = Column(String(length=255), nullable=False)
+    tx_blockNumber = Column(String(length=255), nullable=False)
+    tx_from = Column(String(length=255), nullable=False)
+    tx_to = Column(String(length=255), nullable=False)
+    created_at = Column(String(length=255), nullable=False)
 
 
     def __repr__(self):

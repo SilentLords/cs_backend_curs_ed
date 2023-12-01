@@ -40,8 +40,8 @@ celery_app.conf.beat_schedule = {
         'task': 'app.internal.celery_app.tasks.hello_world',
         'schedule': crontab(minute='*'),  # Запуск каждую минуту
     },
-    'run-task-on-1st-and-15th': {
-        'task': 'app.internal.celery_app.tasks.award_on_1st_and_15th',
-        'schedule': crontab(day_of_month='1,15')
+    'gifts-distribution': {
+        'task': 'app.internal.celery_app.tasks.distribute_gifts',
+        'schedule': timedelta(seconds=30)
     },
 }

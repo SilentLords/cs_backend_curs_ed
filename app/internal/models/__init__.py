@@ -1,6 +1,6 @@
 from .user import User, Billing, Token
 from .billing import BillingAccount, Transaction, TransactionBlock, WithdrawCheck, WithdrawRequest
-
+from .gifts import GiftEvent
 __models__ = [
     User,
     Billing,
@@ -9,6 +9,6 @@ __models__ = [
     Transaction,
     TransactionBlock,
     WithdrawCheck,
-    WithdrawRequest
-
+    WithdrawRequest,
+    GiftEvent
 ]

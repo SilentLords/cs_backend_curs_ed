@@ -34,7 +34,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 async def get_or_create_user(session: AsyncSession, nickname: str, openid: str):
     result = await session.execute(select(User).where(User.nickname == nickname))
-    if res := result.scalars().all():
+    if res := result.unique().scalars().all():
         return res
     new_user = User(nickname=nickname, openid=openid)
     session.add(new_user)

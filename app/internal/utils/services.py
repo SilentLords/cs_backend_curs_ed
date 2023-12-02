@@ -34,7 +34,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 async def get_or_create_user(session: AsyncSession, nickname: str, openid: str):
     result = await session.execute(select(User).where(User.nickname == nickname))
-    if res := result.scalars().all():
+    if res := result.unique().scalars().all():
         return res
     new_user = User(nickname=nickname, openid=openid)
     session.add(new_user)
@@ -306,7 +306,7 @@ async def getting_list_best_players(offset: int, limit: int, get_latest: bool, l
 
     data = await fetch_data_from_external_api(q_param=q_param, path=f'leaderboards/{leaderboard_id}')
     if data:
-        return data['items'][:4]
+        return data['items'][:limit]
     else:
         return {"message": "Auth Error"}
 async def create_session(a_session):

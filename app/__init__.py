@@ -32,6 +32,7 @@ def create_app(_=None) -> FastAPI:
 
 app_ = create_app()
 admin = Admin(engine,
+              base_url='/backend/admin',
               auth_provider=UsernameAndPasswordProvider(),
               middlewares=[Middleware(SessionMiddleware, secret_key="your-secret-key")],
               )

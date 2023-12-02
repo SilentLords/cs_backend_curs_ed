@@ -25,7 +25,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 from app.internal.utils.enums import TRANSACTION_TYPE_CHOICES
 
 router = APIRouter(
-    prefix='/backend/api/v1/users'
+            prefix='/backend/api/v1/users'
 )
 
 oauth = register_oauth()

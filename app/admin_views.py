@@ -54,7 +54,7 @@ class GiftEventModelView(ModelView):
 
 
 users = {
-    "admin": {
+    "admin_evo": {
         "name": "Admin",
         "avatar": "admin.png",
         "company_logo_url": "admin.png",

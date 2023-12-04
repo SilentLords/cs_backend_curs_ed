@@ -99,12 +99,13 @@ class UsernameAndPasswordProvider(AuthProvider):
         raise LoginFailed("Invalid username or password")
 
     async def is_authenticated(self, request) -> bool:
-        if await get_user(request.session["username"],await get_session()):
+        if await find_user(request.session["username"]):
+            user = get_user(request.session["username"], await get_session())
             """
             Save current `user` object in the request state. Can be used later
             to restrict access to connected user.
             """
-            request.state.user = users.get(request.session["username"])
+            request.state.user = user
             return True
 
         return False

@@ -28,6 +28,14 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
+async def find_user(nickname: str) -> bool:
+    session = await get_session()
+    user = await get_user(nickname=nickname, session=session)
+    if user:
+        return True
+    else:
+        return False
+
 async def auth_user(nickname: str, password: str) -> bool:
     session = await get_session()
 
@@ -53,14 +61,14 @@ class GiftEventModelView(ModelView):
               "leaderboard_id", ]
 
 
-users = {
-    "admin": {
-        "name": "Admin",
-        "avatar": "admin.png",
-        "company_logo_url": "admin.png",
-        "roles": ["read", "create", "edit", "delete", "action_make_published"],
-    },
-}
+# users = {
+#     "admin": {
+#         "name": "Admin",
+#         "avatar": "admin.png",
+#         "company_logo_url": "admin.png",
+#         "roles": ["read", "create", "edit", "delete", "action_make_published"],
+#     },
+# }
 
 
 class UsernameAndPasswordProvider(AuthProvider):
@@ -84,7 +92,6 @@ class UsernameAndPasswordProvider(AuthProvider):
             )
 
         if await auth_user(username, password):
-            print('sosi hui')
             """Save `username` in session"""
             request.session["username"] = username
             return response
@@ -92,7 +99,7 @@ class UsernameAndPasswordProvider(AuthProvider):
         raise LoginFailed("Invalid username or password")
 
     async def is_authenticated(self, request) -> bool:
-        if request.session.get("username", None) in users:
+        if await get_user(request.session["username"],await get_session()):
             """
             Save current `user` object in the request state. Can be used later
             to restrict access to connected user.

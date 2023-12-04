@@ -61,14 +61,7 @@ class GiftEventModelView(ModelView):
               "leaderboard_id", ]
 
 
-# users = {
-#     "admin": {
-#         "name": "Admin",
-#         "avatar": "admin.png",
-#         "company_logo_url": "admin.png",
-#         "roles": ["read", "create", "edit", "delete", "action_make_published"],
-#     },
-# }
+
 
 
 class UsernameAndPasswordProvider(AuthProvider):

@@ -18,5 +18,5 @@ RUN  #pip install "git+git://github.com/samuelcolvin/pydantic@master#egg=pydanti
 COPY . .
 EXPOSE 8000
 
-CMD alembic -c /app/alembic.ini upgrade head && uvicorn app:app_ --reload --host 0.0.0.0
+CMD alembic -c /app/alembic.ini upgrade head && uvicorn app:app_ --reload --host 0.0.0.0 --forwarded-allow-ips='*' --proxy-headers
 

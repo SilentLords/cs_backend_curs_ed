@@ -38,6 +38,46 @@ async def get_leaderboard(offset: int, limit: int = 20, get_latest: bool = False
     else:
         return {"message": "Auth Error"}
 
+@router.get("/get_leaderboard/{leaderboard_id}")
+async def get_all_leaderboards(leaderboard_id:str, offset: int, limit: int = 20):
+    q_param = {'offset': offset, "limit": limit}
+    data = await fetch_data_from_external_api(q_param=q_param, path=f'leaderboards/{leaderboard_id}')
+    if data:
+        new_items = []
+        for item in data['items']:
+            item_n = item.copy()
+            item['player']['statistic'] = await collect_base_statistics(nickname=item_n['player']["nickname"],
+                                                                        user_id=item_n['player']["user_id"])
+            new_items.append(item)
+        data['items'] = new_items
+        return data
+    else:
+        return {"message": "Auth Error"}
+
+
+
+@router.get("/get_all_leaderboards")
+async def get_all_leaderboards(offset: int, limit: int = 20):
+    q_param = {'offset': offset, "limit": limit}
+    leaderboards_data = await fetch_data_from_external_api(q_param=q_param,
+                                                           path=f'leaderboards/hubs/8a9629cf-c837-4389-97a1-1c47cf886df4')
+
+
+    all_leaderboards_data = []
+    for leaderboard in leaderboards_data['items']:
+        leaderboard_id = leaderboard['leaderboard_id']
+        data = await fetch_data_from_external_api(q_param=q_param, path=f'leaderboards/{leaderboard_id}')
+        if data:
+            new_items = []
+            for item in data['items']:
+                item_n = item.copy()
+                item['player']['statistic'] = await collect_base_statistics(nickname=item_n['player']["nickname"],
+                                                                            user_id=item_n['player']["user_id"])
+                new_items.append(item)
+            data['items'] = new_items
+            all_leaderboards_data.append(data)
+    return all_leaderboards_data
+
 
 @router.get("/get_lastest_leaderboard")
 async def get_lastest_leaderboard(offset: int, limit: int = 20):
@@ -58,7 +98,6 @@ async def get_lastest_leaderboard(offset: int, limit: int = 20):
     else:
         return {"message": "Auth Error"}
 
-
-@router.get('/test_new_func')
-async def test_new_func():
-    return await prize_distribution()
+# @router.get('/test_new_func')test_new_func
+# async def test_new_func():
+#     return await prize_distribution()

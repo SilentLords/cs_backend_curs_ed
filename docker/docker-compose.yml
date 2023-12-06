@@ -61,24 +61,24 @@ services:
     networks:
       - fastapi_network
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    restart: always
-#    env_file:
-#      - './.envs/.pgadmin_env' # путь к файлу или можешь тут указать переменные
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=mail@gmail.com
-      - PGADMIN_DEFAULT_PASSWORD=BYr0Oe
-      - PGADMIN_LISTEN_PORT=9090
-      - MAX_LOGIN_ATTEMPTS=1000
-    ports:
-      - "9090:9090"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    links:
-      - "db:pgsql-server"
-    networks:
-      - fastapi_network
+#  pgadmin:
+#    image: dpage/pgadmin4:latest
+#    restart: always
+##    env_file:
+##      - './.envs/.pgadmin_env' # путь к файлу или можешь тут указать переменные
+#    environment:
+#      - PGADMIN_DEFAULT_EMAIL=mail@gmail.com
+#      - PGADMIN_DEFAULT_PASSWORD=BYr0Oe
+#      - PGADMIN_LISTEN_PORT=9090
+#      - MAX_LOGIN_ATTEMPTS=1000
+#    ports:
+#      - "9090:9090"
+#    volumes:
+#      - pgadmin-data:/var/lib/pgadmin
+#    links:
+#      - "db:pgsql-server"
+#    networks:
+#      - fastapi_network
 
 #  dozzle:
 #    container_name: dozzle_cs

@@ -19,9 +19,9 @@ ssl_args = {'ssl': {'ca': ca_path}}
 SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{settings.db_username}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
 
 if settings.is_prod == "true":
-    engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, connect_args={"ssl": my_ssl_context})
+    engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, connect_args={"ssl": my_ssl_context}, pool_size=20, max_overflow=0)
 else:
-    engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True)
+    engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, pool_size=20, max_overflow=0)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

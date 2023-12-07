@@ -25,7 +25,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 from app.internal.utils.enums import TRANSACTION_TYPE_CHOICES
 
 router = APIRouter(
-            prefix='/backend/api/v1/users'
+    prefix='/backend/api/v1/users'
 )
 
 oauth = register_oauth()
@@ -63,13 +63,24 @@ async def get_me(session: AsyncSession = Depends(get_session), token: str = Depe
     return user
 
 
+@router.get("/check_my_web3")
+async def check_my_web3(session: AsyncSession = Depends(get_session),
+                        token: str = Depends(oauth2_scheme)):
+    user = await check_auth_user(token=token, session=session)
+    if user.ethereum_ID:
+        return {"has_web3": True}
+    # print(user)
+    return {"has_web3": False}
+
+
 @router.put("/me/change_ethereum_id")
 async def change_ethereum_id(ethereum_ID: str, session: AsyncSession = Depends(get_session),
                              token: str = Depends(oauth2_scheme), ):
     user = await check_auth_user(token=token, session=session)
-    user.ethereum_ID =ethereum_ID
+    user.ethereum_ID = ethereum_ID
     await session.commit()
     return {}
+
 
 @router.get('/statistic')
 async def get_statistic(session: AsyncSession = Depends(get_session),

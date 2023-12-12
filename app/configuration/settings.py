@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     celery_broker_url: str = Field(..., env='CELERY_BROKER_URL')
     celery_result_backend: str = Field(..., env='CELERY_RESULT_BACKEND')
     compose_project_name: str = Field(..., env='COMPOSE_PROJECT_NAME')
+    redis_url: str = Field(..., env='REDIS_URL')
 
     is_prod: str = Field(..., env='IS_PROD')
     oauth_client_id: str = Field(..., env='OAUTH_CLIENT_ID')
@@ -21,7 +22,7 @@ class Settings(BaseSettings):
     oauth_authorize_redirect_path: str = Field(..., env='OAUTH_AUTHORIZE_REDIRECT_PATH')
     faceit_api_key: str = Field(..., env='FACEIT_API_KEY')
     leaderboard_id: str = Field(..., env='LEADERBOARD_ID')
-    game_id: str =  'cs2'
+    game_id: str = 'cs2'
     jwt_secret_key: str = Field(..., env='JWT_SECRET_KEY')
     jwt_algorithm: str = 'HS256'
     access_token_expire_minutes: int = 1000

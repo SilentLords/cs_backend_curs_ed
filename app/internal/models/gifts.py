@@ -10,8 +10,10 @@ class GiftEvent(Base):
     __tablename__ = 'gift_events'
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    season_name = Column(String)
     status = Column(PgEnum(GIFT_EVENT_STATUS_CHOICES_ENUM, name='gift_status', create_type=False), nullable=False,
                     default=GIFT_EVENT_STATUS_CHOICES_ENUM.IN_PROGRESS)
+    is_approved = Column(Boolean, default=False)
     start_at = Column(Date, server_default=func.now(), nullable=False)
     top_one_count = Column(Integer, default=0)
     top_two_count = Column(Integer, default=0)

@@ -54,16 +54,17 @@ def distribute_gifts():
     )
     session = asyncio.run(create_session(async_session))
     gift = select(GiftEvent).filter(GiftEvent.start_at == datetime.date.today())
-    print(datetime.date.today())
-    print("tut req:", gift)
-    result_query = asyncio.run(session.execute(gift))
-    gift = result_query.scalar()
-    print("This is:", gift)
-    if gift:
-        if gift.status == GIFT_EVENT_STATUS_CHOICES_ENUM.IN_PROGRESS:
-            print("Start send Gifts")
-            result = prize_distribution(gift)
-            asyncio.run(result)
+    if gift.is_approved:
+        print(datetime.date.today())
+        print("tut req:", gift)
+        result_query = asyncio.run(session.execute(gift))
+        gift = result_query.scalar()
+        print("This is:", gift)
+        if gift:
+            if gift.status == GIFT_EVENT_STATUS_CHOICES_ENUM.IN_PROGRESS:
+                print("Start send Gifts")
+                result = prize_distribution(gift)
+                asyncio.run(result)
 
 
 

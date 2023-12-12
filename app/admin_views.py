@@ -54,15 +54,16 @@ async def auth_user(nickname: str, password: str) -> bool:
 
 
 class GiftEventModelView(ModelView):
-    fields = [EnumField("status", enum=GIFT_EVENT_STATUS_CHOICES_ENUM, read_only=True, disabled=True),
-              "season_name",
-              "is_approved",
-              "start_at",
-              "top_one_count",
-              "top_two_count",
-              "top_three_count",
-              "top_four_count",
-              "leaderboard_id", ]
+    fields = [
+        EnumField("status", enum=GIFT_EVENT_STATUS_CHOICES_ENUM, exclude_from_edit=True, read_only=True, disabled=True),
+        "season_name",
+        "is_approved",
+        "start_at",
+        "top_one_count",
+        "top_two_count",
+        "top_three_count",
+        "top_four_count",
+        "leaderboard_id", ]
 
     row_actions = ["view", "edit", "create_gift_event", "delete"]
 

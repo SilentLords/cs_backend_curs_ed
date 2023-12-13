@@ -91,25 +91,6 @@ async def debit_user_money(user_id: int, amount: float, transaction_type: TRANSA
     return {'transaction': transaction, 'transaction_block': transaction_block}
 
 
-async def unfreeze_user_money(transaction_id: int, db: AsyncSession = Depends(get_session)):
-    """Выполняет разморозку замороженных средств на балансе пользователя"""
-    query = select(Transaction).where(Transaction.id == transaction_id)
-    result_query = await db.execute(query)
-    transaction = result_query.scalar()
-    if not transaction:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-
-    transaction.type = TRANSACTION_TYPE_CHOICES_ENUM.UNFROZEN
-    query_transaction_block = select(TransactionBlock).where(TransactionBlock.transaction_id == transaction_id)
-    result_query_transaction_block = await db.execute(query_transaction_block)
-    transaction_block = result_query_transaction_block.scalar()
-    if transaction_block:
-        await db.delete(transaction_block)
-    await db.commit()
-
-    return {'transaction': transaction, 'transaction_block': transaction_block}
-
-
 async def freeze_user_money(user_id: int, amount: float,
                             db: AsyncSession = Depends(get_session)) -> TransactionBlock | None:
     try:

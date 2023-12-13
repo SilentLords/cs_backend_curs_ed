@@ -1,10 +1,10 @@
 from app.internal.models import GiftEvent
-from app.internal.routes.leaderboards import get_lastest_leaderboard
+from app.internal.routes.leaderboards import get_latest_leaderboard
 
 
 async def create_new_gift_event(uow: 'SqlAlchemyUnitOfWork'):
     async with uow:
-        leaderboard = await get_lastest_leaderboard(offset=0, limit=1)
+        leaderboard = await get_latest_leaderboard(offset=0, limit=1)
 
         leaderboard_data = leaderboard.get('leaderboard')
 

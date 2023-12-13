@@ -9,8 +9,12 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.configuration.settings import settings
+from app.internal.repository.billing_account import BillingAccountSqlAlchemyRepository
 from app.internal.repository.gift_event import GiftEventSqlAlchemyRepository
 from app.internal.repository.user import UserSqlAlchemyRepository
+from app.internal.repository.transaction_block import TransactionBlockSqlAlchemyRepository
+from app.internal.repository.transaction import TransactionSqlAlchemyRepository
+from app.internal.repository.withdraw_request import WithdrawRequestSqlAlchemyRepository
 
 ca_path = "app/certs/ca-certificate.crt"
 my_ssl_context = ssl.create_default_context(cafile=ca_path)
@@ -63,6 +67,10 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
         self.session = self.session_factory()
         self.gift_event_actions = GiftEventSqlAlchemyRepository(session=self.session)
         self.user_actions = UserSqlAlchemyRepository(session=self.session)
+        self.billing_account_actions = BillingAccountSqlAlchemyRepository(session=self.session)
+        self.transaction_block_actions = TransactionBlockSqlAlchemyRepository(session=self.session)
+        self.transaction_actions = TransactionSqlAlchemyRepository(session=self.session)
+        self.withdraw_request_actions = WithdrawRequestSqlAlchemyRepository(session=self.session)
         return await super().__aenter__()
 
     async def __aexit__(self, *args):

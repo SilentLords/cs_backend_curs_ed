@@ -35,6 +35,9 @@ jobs:
       - name: Apply namespace
         run: kubectl apply -f k8s/namespace.yaml
 
+      - name: Apply secrets
+        run: kubectl apply -f k8s/secrets-dev.yaml
+
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f k8s/deployment.yaml
 

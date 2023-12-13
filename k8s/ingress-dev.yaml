@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: cs
+  name: cs2.game.ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - cs2game.gamefi.codes
+    secretName: coinflip.game
+  rules:
+  - host: "cs2game.gamefi.codes"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/backend/"
+        backend:
+          service:
+            name: cs-backend-service
+            port:
+              number: 80
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: csgo-frontend-service
+            port:
+              number: 80
+  ingressClassName: nginx
+
+

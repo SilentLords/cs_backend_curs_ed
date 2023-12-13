@@ -1,6 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: cs
   name: cs-backend-celery-deployment
 spec:
   replicas: 1

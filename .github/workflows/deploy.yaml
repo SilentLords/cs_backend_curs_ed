@@ -36,11 +36,14 @@ jobs:
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 evomg-k8s
 
+      - name: Apply namespace
+        run: kubectl apply -f k8s/namespace.yaml
+
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f k8s/deployment.yaml
 
       - name: Verify deployment
-        run: kubectl rollout status deployment/cs-backend-deployment
+        run: kubectl rollout status deployment/cs-backend-deployment -n cs
 
       - name: Apply service file if there is any updates
         run: | 
@@ -48,8 +51,14 @@ jobs:
           
       - name: Apply ingress file if there is any updates
         run: | 
-          kubectl apply -f k8s/ingress.yaml 
-          
+          kubectl apply -f k8s/ingress-prod.yaml 
+
+      - name: Remove old images from Container Registry
+        uses: ripplr-io/docr-image-remove@v1
+        with:
+          image_repository: cs-backend
+          buffer_size: 5          
+
   deploy_worker:
     runs-on: ubuntu-22.04
     steps:
@@ -80,6 +89,9 @@ jobs:
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 evomg-k8s
 
+      - name: Apply namespace
+        run: kubectl apply -f k8s/namespace.yaml
+
       - name: Deploy to DigitalOcean Kubernetes
         run: kubectl apply -f k8s/deployment-celery.yaml
 
@@ -90,3 +102,8 @@ jobs:
         run: | 
           kubectl apply -f k8s/service-celery.yaml 
           
+      - name: Remove old images from Container Registry
+        uses: ripplr-io/docr-image-remove@v1
+        with:
+          image_repository: cs-backend-celery
+          buffer_size: 5          

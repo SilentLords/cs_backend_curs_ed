@@ -1,8 +1,4 @@
-from typing import Tuple
-
 from app.internal.models import BillingAccount, User
-from app.internal.user_manager.user_manager import get_user
-from app.internal.utils.schemas import T
 
 
 async def get_or_create_billing_account(uow: 'SqlAlchemyUnitOfWork', user: User):
@@ -16,3 +12,5 @@ async def get_or_create_billing_account(uow: 'SqlAlchemyUnitOfWork', user: User)
             await uow.session.refresh(billing_account)
 
     return billing_account
+
+

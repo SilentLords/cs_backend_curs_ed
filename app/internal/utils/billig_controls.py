@@ -18,7 +18,7 @@ async def withdraw_money(user: User, amount, uow: 'SqlAlchemyUnitOfWork' = Depen
     if amount < decimal.Decimal(0.00000001):
         return False, "Too small amount"
     print("user:", user)
-    status, billing_account = await get_or_create_billing_account(user_id=user.id, uow=uow)
+    billing_account = await get_or_create_billing_account(user=user, uow=uow)
 
     transaction_block = await freeze_user_money(uow=uow, user_id=user.id, amount=amount)
 
@@ -36,6 +36,6 @@ async def withdraw_money(user: User, amount, uow: 'SqlAlchemyUnitOfWork' = Depen
 
 
 async def withdraw_all_money(user, uow: 'SqlAlchemyUnitOfWork' = Depends(get_uow)) -> Tuple[bool, str]:
-    status, data = await get_or_create_billing_account(user_id=user.id, uow=uow)
+    data = await get_or_create_billing_account(user=user, uow=uow)
 
     return await withdraw_money(user, data.balance, uow)

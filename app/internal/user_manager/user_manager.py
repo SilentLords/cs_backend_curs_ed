@@ -1,10 +1,11 @@
 from datetime import timedelta
+
+from jose import jwt, JWTError
+from starlette import status
+
+from app.configuration.settings import settings
 from app.internal.models import User
 from app.internal.utils.schemas import CommonHTTPException, TokenData
-from starlette import status
-from app.configuration.settings import settings
-from jose import jwt, JWTError
-
 from app.internal.utils.services import create_access_token
 
 
@@ -64,3 +65,5 @@ async def auth_user(client, request, uow):
     )
     redirect_uri = '/'
     return access_token, redirect_uri
+
+

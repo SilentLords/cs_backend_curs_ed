@@ -1,27 +1,19 @@
 from typing import Any
 
 from fastapi import HTTPException
-
-from starlette_admin import EnumField, row_action
-from starlette_admin.contrib.sqla import ModelView
-
-from app.internal.db.unit_of_work import SqlAlchemyUnitOfWork
-from app.internal.gift_event_manager.gift_event_manager import create_new_gift_event
-from app.internal.models import User
-from app.internal.utils.auth import pwd_context
-from app.internal.utils.enums import GIFT_EVENT_STATUS_CHOICES_ENUM
 from starlette.requests import Request
-from starlette.responses import Response, RedirectResponse
+from starlette.responses import Response
+from starlette_admin import EnumField, row_action
 from starlette_admin.auth import AdminUser, AuthProvider
+from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError, LoginFailed
 
-from app.internal.utils.services import get_user
-from app.pkg.postgresql import async_session
-
-
-async def get_session():
-    async with async_session() as session:
-        return session
+from app.internal.db.unit_of_work import SqlAlchemyUnitOfWork
+from app.internal.dependencies.uow import get_uow_for_admin
+from app.internal.gift_event_manager.gift_event_manager import create_new_gift_event
+from app.internal.user_manager.user_manager import get_user
+from app.internal.utils.auth import pwd_context
+from app.internal.utils.enums import GIFT_EVENT_STATUS_CHOICES_ENUM
 
 
 def verify_password(plain_password, hashed_password):
@@ -29,9 +21,8 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-async def find_user(nickname: str) -> bool:
-    session = await get_session()
-    user = await get_user(nickname=nickname, session=session)
+async def find_user(nickname: str, uow: 'SqlAlchemyUnitOfWork') -> bool:
+    user = await get_user("nickname", nickname, uow=uow)
     if user:
         return True
     else:
@@ -39,9 +30,8 @@ async def find_user(nickname: str) -> bool:
 
 
 async def auth_user(nickname: str, password: str) -> bool:
-    session = await get_session()
-
-    user = await get_user(nickname=nickname, session=session)
+    uow = get_uow_for_admin()
+    user = await get_user("nickname", nickname, uow=uow)
     print(user, verify_password(password, user.password), user.is_admin)
     if not user or not verify_password(password, user.password) or not user.is_admin:
         raise HTTPException(
@@ -82,9 +72,6 @@ class GiftEventModelView(ModelView):
         return 'GiftEvent успешно создан'
 
 
-
-
-
 class UsernameAndPasswordProvider(AuthProvider):
     """
     This is only for demo purpose, it's not a better
@@ -114,12 +101,9 @@ class UsernameAndPasswordProvider(AuthProvider):
 
     async def is_authenticated(self, request) -> bool:
         if 'username' in request.session.keys():
-            if await find_user(request.session["username"]):
-                user = await get_user(request.session["username"], await get_session())
-                """
-                Save current `user` object in the request state. Can be used later
-                to restrict access to connected user.
-                """
+            uow = get_uow_for_admin()
+            if await find_user(request.session["username"], uow):
+                user = await get_user('nickname', request.session["username"], uow=uow)
                 request.state.user = user
                 return True
 

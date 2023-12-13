@@ -26,11 +26,13 @@ SQLALCHEMY_DATABASE_URL = (
 )
 
 celery_engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False, poolclass=NullPool, connect_args=ssl_context, )
+admin_engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False, poolclass=NullPool, connect_args=ssl_context, )
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False, connect_args=ssl_context, pool_size=100,
                              max_overflow=10)
 
 DEFAULT_SESSION_FACTORY = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 CELERY_SESSION_FACTORY = sessionmaker(celery_engine, expire_on_commit=False, class_=AsyncSession)
+ADMIN_SESSION_FACTORY = sessionmaker(celery_engine, expire_on_commit=False, class_=AsyncSession)
 
 
 class AbstractUnitOfWork(abc.ABC):

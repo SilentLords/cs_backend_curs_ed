@@ -24,11 +24,11 @@ oauth = register_oauth()
 #     return await add_money_to_user(user_id, amount, transaction_type, db)
 #
 #
-@router.post("/debit_money/{user_id}")
-async def debit_money(user_id: int, amount: float, transaction_type: TRANSACTION_TYPE_CHOICES_ENUM,
-                      uow: AsyncSession = Depends(get_uow)):
-    """Списание средств с баланса пользователя"""
-    return await debit_user_money(user_id, -amount, transaction_type, uow)
+# @router.post("/debit_money/{user_id}")
+# async def debit_money(user_id: int, amount: float, transaction_type: TRANSACTION_TYPE_CHOICES_ENUM,
+#                       uow: AsyncSession = Depends(get_uow)):
+#     """Списание средств с баланса пользователя"""
+#     return await debit_user_money(user_id, -amount, transaction_type, uow)
 
 
 #

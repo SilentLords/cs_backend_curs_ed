@@ -9,14 +9,17 @@ from starlette.responses import RedirectResponse, JSONResponse
 
 from fastapi import FastAPI, Depends, HTTPException, APIRouter
 from authlib.integrations.starlette_client import OAuthError
+
+from app.internal.dependencies.uow import get_uow
 from app.internal.models.user import User
 from app.configuration.settings import settings
 from app.internal.utils import schemas
 from app.internal.utils.schemas import CommonHTTPException, TokenData, Statistic
 from app.internal.utils.oauth import register_oauth
-from app.internal.utils.services import get_or_create_user, create_access_token, get_current_active_user, \
-    get_current_user, get_user, check_auth_user, collect_statistics
+from app.internal.utils.services import create_access_token, get_current_active_user, \
+    get_current_user, get_user, collect_statistics
 from app.internal.utils.user import add_money_to_user, debit_user_money, freeze_user_money, unfreeze_user_money
+from app.internal.user_manager.user_manager import get_or_create_user, check_auth_user
 from app.pkg.postgresql import get_session
 from fastapi.security import OAuth2PasswordBearer
 from app.internal.utils.services import fetch_data_from_external_api
@@ -64,9 +67,9 @@ async def get_me(session: AsyncSession = Depends(get_session), token: str = Depe
 
 
 @router.get("/check_my_web3")
-async def check_my_web3(session: AsyncSession = Depends(get_session),
+async def check_my_web3(uow=Depends(get_uow),
                         token: str = Depends(oauth2_scheme)):
-    user = await check_auth_user(token=token, session=session)
+    user = await check_auth_user(token=token, uow=uow)
     if user.ethereum_ID:
         return {"has_web3": True}
     # print(user)
@@ -92,14 +95,13 @@ async def get_statistic(session: AsyncSession = Depends(get_session),
 
 
 @router.get("/login/callback")
-async def auth(request: Request, session: AsyncSession = Depends(get_session)):
+async def auth(request: Request, uow: "SqlAlchemyUnitOfWork" = Depends(get_uow)):
     client = oauth.create_client("Client_cs2")
     try:
         token = await client.authorize_access_token(request)
         user = await client.userinfo(token=token)
         request.session["user"] = dict(user)
-        res = await get_or_create_user(session, request.session['user']['nickname'], request.session['user']['guid'])
-        print(res)
+        res = await get_or_create_user(uow, request.session['user']['nickname'], request.session['user']['guid'])
         access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
         access_token = create_access_token(
             data={"sub": request.session['user']['nickname']}, expires_delta=access_token_expires

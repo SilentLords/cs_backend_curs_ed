@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.configuration.settings import settings
 from app.internal.repository.gift_event import GiftEventSqlAlchemyRepository
+from app.internal.repository.user import UserSqlAlchemyRepository
 
 ca_path = "app/certs/ca-certificate.crt"
 my_ssl_context = ssl.create_default_context(cafile=ca_path)
@@ -20,8 +21,9 @@ SQLALCHEMY_DATABASE_URL = (
     f'postgresql+asyncpg://{settings.db_username}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}'
 )
 
-celery_engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False, poolclass=NullPool, connect_args=ssl_context)
-engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False, connect_args=ssl_context)
+celery_engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False, poolclass=NullPool, connect_args=ssl_context, )
+engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=False, connect_args=ssl_context, pool_size=100,
+                             max_overflow=10)
 
 DEFAULT_SESSION_FACTORY = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 CELERY_SESSION_FACTORY = sessionmaker(celery_engine, expire_on_commit=False, class_=AsyncSession)
@@ -60,6 +62,7 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
     async def __aenter__(self):
         self.session = self.session_factory()
         self.gift_event_actions = GiftEventSqlAlchemyRepository(session=self.session)
+        self.user_actions = UserSqlAlchemyRepository(session=self.session)
         return await super().__aenter__()
 
     async def __aexit__(self, *args):

@@ -13,19 +13,19 @@ async def debit_user_money(user_id: int, amount: float, transaction_type: TRANSA
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    status,billing_account = await get_or_create_billing_account(uow=uow, user=user)
+    billing_account = await get_or_create_billing_account(uow=uow, user=user)
     balance_after_transaction = billing_account.balance
     balance_after_transaction -= amount
     if balance_after_transaction < 0:
         raise HTTPException(status_code=400, detail="Not enough money")
-    async with uow:
 
-        new_transaction = Transaction(account=billing_account, amount=amount,
-                                      balance_after_transaction=balance_after_transaction, type=transaction_type)
+    async with uow:
+        new_transaction = Transaction(account=billing_account, amount=1500,
+                                      balance_after_transaction=1500, type=transaction_type)
         uow.transaction_actions.add(new_transaction)
-        uow.session.commit()
-        uow.session.refresh(new_transaction)
+        await uow.session.commit()
+        await uow.session.refresh(new_transaction)
         billing_account.balance = new_transaction.balance_after_transaction
-        uow.session.commit()
+        await uow.session.commit()
 
     return new_transaction

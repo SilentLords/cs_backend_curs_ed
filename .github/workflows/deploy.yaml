@@ -19,7 +19,7 @@ jobs:
           
       - name: Load ENV for the app
         run: |
-          echo -E '${{ secrets.PROD_ENV_FILE }}' > docker/env_files/.env
+          echo -E '${{ vars.PROD_ENV_FILE }}' > docker/env_files/.env
         
       - name: Build container image
         run: docker build -t registry.digitalocean.com/evomg-cr/cs-backend:$(echo $GITHUB_SHA | head -c7) -f docker/api/Dockerfile .

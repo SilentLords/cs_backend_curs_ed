@@ -1,16 +1,17 @@
-import asyncio
+from typing import Any
 
 from fastapi import HTTPException
-from select import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette_admin import EnumField
-from starlette_admin.contrib.sqla import Admin, ModelView
 
+from starlette_admin import EnumField, row_action
+from starlette_admin.contrib.sqla import ModelView
+
+from app.internal.db.unit_of_work import SqlAlchemyUnitOfWork
+from app.internal.gift_event_manager.gift_event_manager import create_new_gift_event
 from app.internal.models import User
 from app.internal.utils.auth import pwd_context
 from app.internal.utils.enums import GIFT_EVENT_STATUS_CHOICES_ENUM
 from starlette.requests import Request
-from starlette.responses import Response
+from starlette.responses import Response, RedirectResponse
 from starlette_admin.auth import AdminUser, AuthProvider
 from starlette_admin.exceptions import FormValidationError, LoginFailed
 
@@ -36,6 +37,7 @@ async def find_user(nickname: str) -> bool:
     else:
         return False
 
+
 async def auth_user(nickname: str, password: str) -> bool:
     session = await get_session()
 
@@ -52,23 +54,35 @@ async def auth_user(nickname: str, password: str) -> bool:
 
 
 class GiftEventModelView(ModelView):
-    fields = [EnumField("status", enum=GIFT_EVENT_STATUS_CHOICES_ENUM, read_only=True, disabled=True),
-              "start_at",
-              "top_one_count",
-              "top_two_count",
-              "top_three_count",
-              "top_four_count",
-              "leaderboard_id", ]
+    fields = [
+        EnumField("status", enum=GIFT_EVENT_STATUS_CHOICES_ENUM, exclude_from_edit=True, read_only=True, disabled=True),
+        "season_name",
+        "is_approved",
+        "start_at",
+        "top_one_count",
+        "top_two_count",
+        "top_three_count",
+        "top_four_count",
+        "leaderboard_id", ]
+
+    row_actions = ["view", "edit", "create_gift_event", "delete"]
+
+    @row_action(
+        name="create_gift_event",
+        text="Создать новый GiftEvent",
+        confirmation="Вы уверены что хотите создать новый GiftEvent?",
+        icon_class="fas fa-check-circle",
+        submit_btn_text="Подтвердить",
+        submit_btn_class="btn-success",
+        action_btn_class="btn-info",
+    )
+    async def create_new_gift_event_button(self, request: Request, pk: Any) -> str:
+        uow = SqlAlchemyUnitOfWork()
+        await create_new_gift_event(uow=uow)
+        return 'GiftEvent успешно создан'
 
 
-# users = {
-#     "admin": {
-#         "name": "Admin",
-#         "avatar": "admin.png",
-#         "company_logo_url": "admin.png",
-#         "roles": ["read", "create", "edit", "delete", "action_make_published"],
-#     },
-# }
+
 
 
 class UsernameAndPasswordProvider(AuthProvider):
@@ -101,7 +115,7 @@ class UsernameAndPasswordProvider(AuthProvider):
     async def is_authenticated(self, request) -> bool:
         if 'username' in request.session.keys():
             if await find_user(request.session["username"]):
-                user = get_user(request.session["username"], await get_session())
+                user = await get_user(request.session["username"], await get_session())
                 """
                 Save current `user` object in the request state. Can be used later
                 to restrict access to connected user.

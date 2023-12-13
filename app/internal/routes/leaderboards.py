@@ -70,15 +70,7 @@ async def get_all_leaderboards(offset: int, limit: int = 20):
         for leaderboard in leaderboards_data['items']:
             leaderboard_id = leaderboard['leaderboard_id']
             data = await fetch_data_from_external_api(q_param=q_param, path=f'leaderboards/{leaderboard_id}')
-            if data:
-                new_items = []
-                for item in data['items']:
-                    item_n = item.copy()
-                    item['player']['statistic'] = await collect_base_statistics(nickname=item_n['player']["nickname"],
-                                                                                user_id=item_n['player']["user_id"])
-                    new_items.append(item)
-                data['items'] = new_items
-                all_leaderboards_data.append(data)
+            all_leaderboards_data.append(data)
         return all_leaderboards_data
     else:
         return {"message": "Leaderboard error"}

@@ -82,14 +82,7 @@ class GiftEventModelView(ModelView):
         return 'GiftEvent успешно создан'
 
 
-# users = {
-#     "admin": {
-#         "name": "Admin",
-#         "avatar": "admin.png",
-#         "company_logo_url": "admin.png",
-#         "roles": ["read", "create", "edit", "delete", "action_make_published"],
-#     },
-# }
+
 
 
 class UsernameAndPasswordProvider(AuthProvider):

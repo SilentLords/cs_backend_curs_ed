@@ -3,7 +3,7 @@ name: Build and Test Container
 on:
   push:
     branches:
-      - '*dev*'
+      - 'devOLD'
 
 jobs:
   build:

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Float, MetaData, Table, DateTime, func, Date
+from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Float, MetaData, Table, DateTime, func
 from app.internal.utils.enums import GIFT_EVENT_STATUS_CHOICES_ENUM
 from .base import Base, ChoiceType
 from sqlalchemy.dialects.postgresql import ENUM as PgEnum
@@ -14,7 +14,7 @@ class GiftEvent(Base):
     status = Column(PgEnum(GIFT_EVENT_STATUS_CHOICES_ENUM, name='gift_status', create_type=False), nullable=False,
                     default=GIFT_EVENT_STATUS_CHOICES_ENUM.IN_PROGRESS)
     is_approved = Column(Boolean, default=False)
-    start_at = Column(Date, server_default=func.now(), nullable=False)
+    start_at = Column(DateTime, server_default=func.now(), nullable=False)
     top_one_count = Column(Integer, default=0)
     top_two_count = Column(Integer, default=0)
     top_three_count = Column(Integer, default=0)

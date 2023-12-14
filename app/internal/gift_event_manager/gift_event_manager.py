@@ -22,8 +22,10 @@ async def create_new_gift_event(uow: 'SqlAlchemyUnitOfWork'):
 #['jaw1ko', 'larik-_-', 'Clash_RideR', 'Alamov']
 async def start_distribute_gifts(uow: 'SqlAlchemyUnitOfWork'):
     async with uow:
-        gift = await uow.gift_event_actions.get_first_by_field('start_at', datetime.date.today())
-        print(gift, gift.is_approved, gift.status)
-        if gift:
-            if gift.is_approved and gift.status == GIFT_EVENT_STATUS_CHOICES_ENUM.IN_PROGRESS:
-                result = await prize_distribution(gift)
+        all_gifts = await uow.gift_event_actions.get_all_by_field('status', [GIFT_EVENT_STATUS_CHOICES_ENUM.IN_PROGRESS])
+        for gift in all_gifts:
+            if gift.start_at < datetime.datetime.now():
+                print(gift, gift.is_approved, gift.status)
+                if gift:
+                    if gift.is_approved and gift.status == GIFT_EVENT_STATUS_CHOICES_ENUM.IN_PROGRESS:
+                        result = await prize_distribution(gift)

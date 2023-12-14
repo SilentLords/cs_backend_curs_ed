@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import HTTPException
 from starlette.requests import Request
 from starlette.responses import Response
-from starlette_admin import EnumField, row_action
+from starlette_admin import EnumField, row_action, DateTimeField
 from starlette_admin.auth import AdminUser, AuthProvider
 from starlette_admin.contrib.sqla import ModelView
 from starlette_admin.exceptions import FormValidationError, LoginFailed
@@ -48,7 +48,7 @@ class GiftEventModelView(ModelView):
         EnumField("status", enum=GIFT_EVENT_STATUS_CHOICES_ENUM, exclude_from_edit=True, read_only=True, disabled=True),
         "season_name",
         "is_approved",
-        "start_at",
+        DateTimeField("start_at", help_text="Все данные указываются в часовом поясе UTC (+0) "),
         "top_one_count",
         "top_two_count",
         "top_three_count",

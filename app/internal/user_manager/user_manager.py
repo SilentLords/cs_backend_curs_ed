@@ -45,7 +45,7 @@ async def change_web3_in_user(token: str, uow: 'SqlAlchemyUnitOfWork', ethereum_
     user = await check_auth_user(token=token, uow=uow)
     async with uow:
         uow.user_actions.update(user, {'ethereum_ID': ethereum_ID})
-        uow.commit()
+        await uow.commit()
 
 
 async def get_user(field_name: str, field_value: str | int, uow: 'SqlAlchemyUnitOfWork') -> User | None:
